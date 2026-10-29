@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load statuts %}
+
+{% block titre %}{{ equipement.nom }}{% endblock %}
+{% block titre_page %}{{ equipement.nom }}{% endblock %}
+
+{% block actions %}
+<a href="{% url 'equipements:liste' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+  <i data-lucide="arrow-left"></i> Liste
+</a>
+{% if est_admin %}
+<a href="{% url 'equipements:modifier' equipement.pk %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
+  <i data-lucide="pencil"></i> Modifier
+</a>
+<a href="{% url 'equipements:supprimer' equipement.pk %}" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1">
+  <i data-lucide="trash-2"></i> Supprimer
+</a>
+{% endif %}
+{% endblock %}
+
+{% block contenu %}
+<div class="row g-3 mb-3">
+  {# ---------- Informations (F2.6) ---------- #}
+  <div class="col-lg-8">
+    <div class="at-card h-100">
+      <h2 class="h6 mb-3">Informations</h2>
+      <dl class="row mb-0 at-fiche">
+        <dt class="col-sm-4">Nom</dt><dd class="col-sm-8">{{ equipement.nom }}</dd>
+        <dt class="col-sm-4">N° de série</dt><dd class="col-sm-8 font-monospace">{{ equipement.numero_serie }}</dd>
+        <dt class="col-sm-4">Marque</dt><dd class="col-sm-8">{{ equipement.marque }}</dd>
+        <dt class="col-sm-4">Catégorie</dt><dd class="col-sm-8">{{ equipement.type.categorie|default:"Non classé" }}</dd>
+        <dt class="col-sm-4">Type</dt><dd class="col-sm-8">{{ equipement.type }}</dd>
+        <dt class="col-sm-4">Emplacement</dt><dd class="col-sm-8">{{ equipement.emplacement }}</dd>
+        <dt class="col-sm-4">Fournisseur</dt>
+        <dd class="col-sm-8">
+          {% if equipement.fournisseur %}
+            {{ equipement.fournisseur }}
+            {% if equipement.fournisseur.telephone %}<span class="text-secondary"> · {{ equipement.fournisseur.telephone }}</span>{% endif %}
+          {% else %}<span class="text-secondary">Non renseigné</span>{% endif %}
+        </dd>
+        <dt class="col-sm-4">Date d'installation</dt>
+        <dd class="col-sm-8">{{ equipement.date_installation|date:"d/m/Y"|default:"Non renseignée" }}</dd>
+        <dt class="col-sm-4">Dernière mise à jour</dt>
+        <dd class="col-sm-8 text-secondary">{{ equipement.modifie_le|date:"d/m/Y à H:i" }}</dd>
+      </dl>
+    </div>
+  </div>
+
+  {# ---------- Statut (F2.7) ---------- #}
+  <div class="col-lg-4">
+    <div class="at-card h-100">
+      <h2 class="h6 mb-3">Statut actuel</h2>
+      <p class="at-statut-grand">{{ equipement.statut|badge_statut }}</p>
+
+      {% if est_admin or est_technicien %}
+      <form method="post" action="{% url 'equipements:statut' equipement.pk %}" class="mt-3">
+        {% csrf_token %}
+        {% include "includes/formulaire.html" with form=form_statut %}
+        <button type="submit" class="btn btn-primary btn-sm w-100">Changer le statut</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{# ---------- Interventions et historique des pannes (F2.6, F4.4) ---------- #}
+<div class="at-card mb-3">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="h6 mb-0">Interventions</h2>
+    <div class="d-flex gap-2">
+      {% if nb_interventions > interventions|length %}
+      <a href="{% url 'interventions:liste' %}?equipement={{ equipement.pk }}" class="btn btn-sm btn-outline-secondary">Voir les {{ nb_interventions }} interventions</a>
+      {% endif %}
+      {% if est_admin or est_technicien %}
+      <a href="{% url 'interventions:ajouter' %}?equipement={{ equipement.pk }}" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+        <i data-lucide="plus"></i> Nouvelle intervention
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="at-pannes mb-3">
+    <div><span class="at-pannes-chiffre">{{ nb_pannes }}</span> panne{{ nb_pannes|pluralize }} déclarée{{ nb_pannes|pluralize }}</div>
+    <div><span class="at-pannes-chiffre">{{ nb_correctives }}</span> intervention{{ nb_correctives|pluralize }} corrective{{ nb_correctives|pluralize }}</div>
+    <div class="text-secondary">Dernière panne : {{ derniere_panne.date|date:"d/m/Y"|default:"aucune" }}</div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle at-table mb-0">
+      <thead><tr><th>Date</th><th>Type</th><th>Technicien</th><th>Commentaire</th><th></th></tr></thead>
+      <tbody>
+        {% for i in interventions %}
+        <tr>
+          <td class="text-nowrap">{{ i.date|date:"d/m/Y" }}</td>
+          <td>{% include "interventions/_type.html" with intervention=i %}</td>
+          <td>{{ i.technicien }}</td>
+          <td class="small">{{ i.commentaire|truncatechars:80|default:"—" }}</td>
+          <td class="text-end"><a href="{% url 'interventions:detail' i.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir"><i data-lucide="eye"></i></a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-secondary py-3">Aucune intervention enregistrée.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{# ---------- Historique des statuts ---------- #}
+<div class="at-card">
+  <h2 class="h6 mb-3">Historique des statuts</h2>
+  <div class="table-responsive">
+    <table class="table align-middle at-table mb-0">
+      <thead><tr><th>Date</th><th>Ancien statut</th><th>Nouveau statut</th><th>Par</th><th>Commentaire</th></tr></thead>
+      <tbody>
+        {% for h in historique %}
+        <tr>
+          <td class="text-nowrap">{{ h.date|date:"d/m/Y H:i" }}</td>
+          <td>{{ h.ancien_statut|badge_statut }}</td>
+          <td>{{ h.nouveau_statut|badge_statut }}</td>
+          <td>{{ h.auteur.get_full_name|default:h.auteur.username|default:"—" }}</td>
+          <td>{{ h.commentaire|default:"—" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-secondary py-3">Aucun changement de statut enregistré.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

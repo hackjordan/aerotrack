@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block titre %}Comptes{% endblock %}
+{% block titre_page %}Comptes{% endblock %}
+
+{% block contenu %}
+<div class="at-card">
+  <div class="at-card-entete">
+    <h2 class="h6 mb-0">Liste des comptes</h2>
+    <a href="{% url 'comptes:ajouter' %}" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="user-plus"></i> Nouveau compte
+    </a>
+  </div>
+
+  <form method="get" class="at-filtres-barre mb-3" role="search">
+    <div class="at-recherche">
+      <i data-lucide="search"></i>
+      <input type="search" name="q" value="{{ recherche }}" class="form-control" placeholder="Rechercher par identifiant, nom ou prénom" aria-label="Rechercher">
+    </div>
+    {% if recherche %}<a href="{% url 'comptes:utilisateurs' %}" class="btn btn-link">Effacer</a>{% endif %}
+  </form>
+
+  <div class="table-responsive">
+    <table class="table align-middle at-table">
+      <thead>
+        <tr>
+          <th>Identifiant</th>
+          <th>Nom et prénom</th>
+          <th>Rôle</th>
+          <th>État</th>
+          <th>Dernière connexion</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in page %}
+        <tr>
+          <td class="fw-semibold">{{ u.username }}</td>
+          <td>{{ u.last_name|upper }} {{ u.first_name }}</td>
+          <td>{% if u.role %}<span class="at-role at-role-{{ u.role|lower }}">{{ u.role }}</span>{% else %}<span class="text-secondary">Aucun</span>{% endif %}</td>
+          <td>
+            {% if u.is_active %}<span class="at-badge at-badge-ok">Actif</span>
+            {% else %}<span class="at-badge at-badge-inactif">Désactivé</span>{% endif %}
+          </td>
+          <td class="text-secondary">{{ u.last_login|date:"d/m/Y H:i"|default:"Jamais" }}</td>
+          <td class="text-end text-nowrap">
+            <a href="{% url 'comptes:modifier' u.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i data-lucide="pencil"></i></a>
+            <a href="{% url 'comptes:reinitialiser' u.pk %}" class="btn btn-sm btn-outline-secondary" title="Réinitialiser le mot de passe"><i data-lucide="key-round"></i></a>
+            {% if u.pk != user.pk %}
+            <form method="post" action="{% url 'comptes:activation' u.pk %}" class="d-inline">
+              {% csrf_token %}
+              {% if u.is_active %}
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Désactiver"
+                        onclick="return confirm('Désactiver le compte « {{ u.username|escapejs }} » ?');"><i data-lucide="user-x"></i></button>
+              {% else %}
+                <button type="submit" class="btn btn-sm btn-outline-success" title="Réactiver"><i data-lucide="user-check"></i></button>
+              {% endif %}
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-secondary py-4">Aucun compte trouvé.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{# Page de confirmation commune. Contexte : objet, nature ("l'emplacement"…), message_blocage, url_annuler. #}
+{% block titre %}Supprimer {{ objet }}{% endblock %}
+{% block titre_page %}Supprimer {{ nature }}{% endblock %}
+
+{% block contenu %}
+<div class="at-card at-form-carte">
+  {% if message_blocage %}
+    <div class="alert alert-warning mb-3">{{ message_blocage }}</div>
+    <a href="{{ url_annuler }}" class="btn btn-outline-secondary">Retour</a>
+  {% else %}
+    <p>Voulez-vous vraiment supprimer {{ nature }} <strong>« {{ objet }} »</strong> ? Cette action est <strong>définitive</strong>.</p>
+    <form method="post" class="d-flex gap-2">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+      <a href="{{ url_annuler }}" class="btn btn-outline-secondary">Annuler</a>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

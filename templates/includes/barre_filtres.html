@@ -1,0 +1,16 @@
+{% comment %}
+  Barre de recherche compacte + panneau de filtres repliable + étiquettes des filtres actifs.
+  À inclure dans un <form method="get">. Contexte : filtres.q, puces, placeholder, url_reinitialiser.
+  Le contenu du panneau est fourni par le bloc « panneau » de la page, via la variable panneau_id.
+{% endcomment %}
+<div class="at-filtres-barre">
+  <div class="at-recherche">
+    <i data-lucide="search"></i>
+    <input type="search" name="q" value="{{ filtres.q }}" class="form-control" placeholder="{{ placeholder }}" aria-label="Rechercher">
+  </div>
+  <button type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1 at-btn-filtres"
+          data-bs-toggle="collapse" data-bs-target="#{{ panneau_id }}" aria-expanded="false" aria-controls="{{ panneau_id }}">
+    <i data-lucide="sliders-horizontal"></i> Filtres
+    {% if puces %}<span class="badge rounded-pill text-bg-primary">{{ puces|length }}</span>{% endif %}
+  </button>
+</div>

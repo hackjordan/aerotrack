@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titre %}Comptes{% endblock %}
+{% block titre_page %}{{ titre }}{% endblock %}
+
+{% block contenu %}
+<div class="at-card at-form-carte">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "includes/formulaire.html" %}
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <a href="{% url 'comptes:utilisateurs' %}" class="btn btn-outline-secondary">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

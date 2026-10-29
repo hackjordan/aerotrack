@@ -1,0 +1,130 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titre %}Accueil{% endblock %} · AéroTrack</title>
+  <link rel="icon" href="{% static 'img/logo-asecna.jpg' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/aerotrack.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="at-layout" id="at-layout">
+
+  {# ---------- Barre latérale ---------- #}
+  <aside class="at-sidebar" id="at-sidebar">
+    {# Logo + nom quand la barre est ouverte ; logo seul quand elle est repliée. #}
+    <a class="at-brand" href="{% url 'tableau_bord:accueil' %}" title="AéroTrack">
+      <img src="{% static 'img/logo-asecna.jpg' %}" alt="Logo ASECNA" class="at-brand-logo">
+      <span class="at-nav-texte"><span class="at-nom-aero">Aéro</span><span class="at-nom-track">Track</span></span>
+    </a>
+
+    {# Le texte des liens est dans .at-nav-texte : masqué quand la barre est repliée, seules les icônes restent. #}
+    {% with nom=request.resolver_match.url_name %}
+    <nav class="at-nav">
+      <a class="at-nav-link {% if nom == 'accueil' %}active{% endif %}" href="{% url 'tableau_bord:accueil' %}" title="Tableau de bord">
+        <i data-lucide="layout-dashboard"></i> <span class="at-nav-texte">Tableau de bord</span>
+      </a>
+
+      {# Un lien par module du cahier des charges. #}
+      <a class="at-nav-link {% if request.resolver_match.app_name == 'equipements' %}active{% endif %}" href="{% url 'equipements:liste' %}" title="Équipements">
+        <i data-lucide="server"></i> <span class="at-nav-texte">Équipements</span>
+      </a>
+      <a class="at-nav-link {% if request.resolver_match.app_name == 'emplacements' %}active{% endif %}" href="{% url 'emplacements:liste' %}" title="Emplacements">
+        <i data-lucide="map-pin"></i> <span class="at-nav-texte">Emplacements</span>
+      </a>
+      <a class="at-nav-link {% if request.resolver_match.app_name == 'interventions' %}active{% endif %}" href="{% url 'interventions:liste' %}" title="Interventions">
+        <i data-lucide="wrench"></i> <span class="at-nav-texte">Interventions</span>
+      </a>
+      <a class="at-nav-link {% if request.resolver_match.app_name == 'referentiels' %}active{% endif %}" href="{% url 'referentiels:index' %}" title="Référentiels">
+        <i data-lucide="tags"></i> <span class="at-nav-texte">Référentiels</span>
+      </a>
+      {% if est_admin %}
+      <a class="at-nav-link {% if request.resolver_match.app_name == 'comptes' and nom != 'mot_de_passe' %}active{% endif %}" href="{% url 'comptes:utilisateurs' %}" title="Comptes">
+        <i data-lucide="users"></i> <span class="at-nav-texte">Comptes</span>
+      </a>
+      {% endif %}
+    </nav>
+    {% endwith %}
+
+    {# Déconnexion toujours visible en bas de la barre (POST : protection CSRF) #}
+    <form method="post" action="{% url 'comptes:deconnexion' %}" class="at-sidebar-bas">
+      {% csrf_token %}
+      <button type="submit" class="at-nav-link at-deconnexion" title="Se déconnecter">
+        <i data-lucide="log-out"></i> <span class="at-nav-texte">Se déconnecter</span>
+      </button>
+    </form>
+  </aside>
+
+  {# Voile sombre derrière la barre latérale sur petit écran #}
+  <div class="at-overlay" id="at-overlay"></div>
+
+  {# ---------- Contenu ---------- #}
+  <div class="at-main">
+    <header class="at-topbar">
+      <div class="at-topbar-left">
+        <button type="button" class="at-menu-btn" id="at-menu-btn"
+                aria-label="Afficher ou masquer le menu" aria-controls="at-sidebar" aria-expanded="true">
+          <i data-lucide="menu"></i>
+        </button>
+        <h1 class="at-page-title">{% block titre_page %}{% endblock %}</h1>
+      </div>
+      <div class="at-topbar-actions">
+        {% block actions %}{% endblock %}
+
+        {# Menu de l'utilisateur connecté #}
+        <div class="dropdown">
+          <button type="button" class="at-user-btn" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="at-avatar">
+              {% if user.first_name or user.last_name %}{{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}{% else %}{{ user.username|slice:":1"|upper }}{% endif %}
+            </span>
+            <span class="at-user-info">
+              <span class="at-user-nom">{{ user.get_full_name|default:user.username }}</span>
+              <span class="at-user-role">{{ role|default:"Aucun rôle" }}</span>
+            </span>
+            <i data-lucide="chevron-down" class="at-user-chevron"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <li><span class="dropdown-item-text small text-secondary">Connecté en tant que <strong>{{ user.username }}</strong></span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item at-dropdown-item" href="{% url 'comptes:mot_de_passe' %}">
+                <i data-lucide="key-round"></i> Changer mon mot de passe
+              </a>
+            </li>
+            <li>
+              <form method="post" action="{% url 'comptes:deconnexion' %}">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item at-dropdown-item text-danger">
+                  <i data-lucide="log-out"></i> Se déconnecter
+                </button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="at-content">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block contenu %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/lucide/lucide.min.js' %}"></script>
+<script>lucide.createIcons();</script>
+<script src="{% static 'js/aerotrack.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

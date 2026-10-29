@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block titre %}Emplacements{% endblock %}
+{% block titre_page %}Emplacements{% endblock %}
+
+{% block contenu %}
+<div class="at-card">
+  <div class="at-card-entete">
+    <h2 class="h6 mb-0">Liste des emplacements</h2>
+    {% if est_admin %}
+    <a href="{% url 'emplacements:ajouter' %}" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="plus"></i> Nouvel emplacement
+    </a>
+    {% endif %}
+  </div>
+
+  <form method="get" class="at-filtres-barre mb-3" role="search">
+    <div class="at-recherche">
+      <i data-lucide="search"></i>
+      <input type="search" name="q" value="{{ recherche }}" class="form-control" placeholder="Rechercher un bâtiment ou une zone" aria-label="Rechercher">
+    </div>
+    {% if recherche %}<a href="{% url 'emplacements:liste' %}" class="btn btn-link">Effacer</a>{% endif %}
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle at-table">
+      <thead>
+        <tr><th>Bâtiment</th><th>Zone</th><th>Équipements</th><th>En panne</th><th class="text-end"></th></tr>
+      </thead>
+      <tbody>
+        {% for e in page %}
+        <tr>
+          <td class="fw-semibold">{{ e.batiment }}</td>
+          <td>{{ e.zone }}</td>
+          <td>{{ e.nb_equipements }}</td>
+          <td>{% if e.nb_pannes %}<span class="at-badge at-badge-panne">{{ e.nb_pannes }}</span>{% else %}<span class="text-secondary">0</span>{% endif %}</td>
+          <td class="text-end text-nowrap">
+            <a href="{% url 'emplacements:detail' e.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir les équipements"><i data-lucide="eye"></i></a>
+            {% if est_admin %}
+            <a href="{% url 'emplacements:modifier' e.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i data-lucide="pencil"></i></a>
+            <a href="{% url 'emplacements:supprimer' e.pk %}" class="btn btn-sm btn-outline-danger" title="Supprimer"><i data-lucide="trash-2"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-secondary py-4">Aucun emplacement trouvé.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{# Affiche tous les champs d'un formulaire avec la mise en forme Bootstrap. #}
+{% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for erreur in form.non_field_errors %}{{ erreur }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+  </div>
+{% endif %}
+
+{% for champ in form.hidden_fields %}{{ champ }}{% endfor %}
+
+{% for champ in form.visible_fields %}
+  {% if champ.widget_type == "checkbox" %}
+    <div class="form-check mb-3">
+      {{ champ }}
+      <label class="form-check-label" for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+      {% if champ.help_text %}<div class="form-text">{{ champ.help_text|safe }}</div>{% endif %}
+      {% for erreur in champ.errors %}<div class="invalid-feedback d-block">{{ erreur }}</div>{% endfor %}
+    </div>
+  {% else %}
+    <div class="mb-3">
+      <label class="form-label" for="{{ champ.id_for_label }}">
+        {{ champ.label }}{% if champ.field.required %} <span class="text-danger">*</span>{% endif %}
+      </label>
+      {{ champ }}
+      {% for erreur in champ.errors %}<div class="invalid-feedback">{{ erreur }}</div>{% endfor %}
+      {% if champ.help_text %}<div class="form-text">{{ champ.help_text|safe }}</div>{% endif %}
+    </div>
+  {% endif %}
+{% endfor %}

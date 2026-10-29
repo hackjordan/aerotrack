@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static statuts %}
+
+{% block titre %}Tableau de bord{% endblock %}
+{% block titre_page %}Tableau de bord{% endblock %}
+
+{% block contenu %}
+{# ---------- F6.1 : compteurs (un clic ouvre la liste filtrée) ---------- #}
+<div class="row g-3 mb-3">
+  <div class="col-sm-6 col-xl-3">
+    <a class="at-card at-compteur at-compteur-total" href="{% url 'equipements:liste' %}">
+      <span class="at-compteur-icone"><i data-lucide="server"></i></span>
+      <span><span class="at-compteur-valeur">{{ compteurs.total }}</span><span class="at-compteur-libelle">Équipements</span></span>
+    </a>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <a class="at-card at-compteur at-compteur-ok" href="{% url 'equipements:liste' %}?statut=FONCTIONNEL">
+      <span class="at-compteur-icone"><i data-lucide="circle-check"></i></span>
+      <span><span class="at-compteur-valeur">{{ compteurs.fonctionnels }}</span><span class="at-compteur-libelle">Fonctionnels</span></span>
+    </a>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <a class="at-card at-compteur at-compteur-panne" href="{% url 'equipements:liste' %}?statut=EN_PANNE">
+      <span class="at-compteur-icone"><i data-lucide="triangle-alert"></i></span>
+      <span><span class="at-compteur-valeur">{{ compteurs.en_panne }}</span><span class="at-compteur-libelle">En panne</span></span>
+    </a>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <a class="at-card at-compteur at-compteur-maint" href="{% url 'equipements:liste' %}?statut=EN_MAINTENANCE">
+      <span class="at-compteur-icone"><i data-lucide="wrench"></i></span>
+      <span><span class="at-compteur-valeur">{{ compteurs.en_maintenance }}</span><span class="at-compteur-libelle">En maintenance</span></span>
+    </a>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  {# ---------- F6.2 : répartition par catégorie ---------- #}
+  <div class="col-lg-6">
+    <div class="at-card h-100">
+      <h2 class="h6 mb-3">Répartition des équipements par catégorie</h2>
+      {% if repartition %}
+      <div class="at-camembert">
+        <div class="at-camembert-graphique">
+          <canvas id="graphique-categories" role="img" aria-label="Graphique circulaire : répartition des équipements par catégorie"></canvas>
+        </div>
+        {# Légende avec nombre et pourcentage : l'identité ne repose jamais sur la seule couleur #}
+        <ul class="at-legende">
+          {% for part in repartition %}
+          <li>
+            <a href="{% url 'equipements:liste' %}{% if part.pk %}?categorie={{ part.pk }}{% endif %}">
+              <span class="at-legende-pastille" style="background: {{ part.couleur }}"></span>
+              <span class="at-legende-nom">{{ part.libelle }}</span>
+              <span class="at-legende-valeur">{{ part.nb }} <span class="text-secondary">· {{ part.pourcentage }} %</span></span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% else %}
+      <p class="text-secondary mb-0">Aucun équipement enregistré pour le moment.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ---------- F6.4 : équipements en panne ---------- #}
+  <div class="col-lg-6">
+    <div class="at-card h-100">
+      <div class="at-card-entete">
+        <h2 class="h6 mb-0">Équipements en panne</h2>
+        {% if compteurs.en_panne %}<a href="{% url 'equipements:liste' %}?statut=EN_PANNE" class="small">Voir tout ({{ compteurs.en_panne }})</a>{% endif %}
+      </div>
+      {% if en_panne %}
+      <ul class="at-liste-simple">
+        {% for e in en_panne %}
+        <li>
+          <a href="{% url 'equipements:detail' e.pk %}">
+            <span>
+              <span class="fw-semibold">{{ e.nom }}</span>
+              <span class="d-block small text-secondary">{{ e.emplacement }}</span>
+            </span>
+            {% if e.depuis %}<span class="small text-secondary text-nowrap">depuis le {{ e.depuis|date:"d/m/Y" }}</span>{% endif %}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="at-vide"><i data-lucide="circle-check"></i> Aucun équipement en panne.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{# ---------- F6.4 : 5 dernières interventions ---------- #}
+<div class="at-card">
+  <div class="at-card-entete">
+    <h2 class="h6 mb-0">Dernières interventions</h2>
+    <a href="{% url 'interventions:liste' %}" class="small">Voir toutes les interventions</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle at-table mb-0">
+      <thead><tr><th>Date</th><th>Équipement</th><th>Type</th><th>Technicien</th><th>Statut actuel</th></tr></thead>
+      <tbody>
+        {% for i in dernieres_interventions %}
+        <tr>
+          <td class="text-nowrap"><a href="{% url 'interventions:detail' i.pk %}" class="text-decoration-none">{{ i.date|date:"d/m/Y" }}</a></td>
+          <td><a href="{% url 'equipements:detail' i.equipement.pk %}" class="fw-semibold text-decoration-none">{{ i.equipement.nom }}</a></td>
+          <td>{% include "interventions/_type.html" with intervention=i %}</td>
+          <td>{{ i.technicien }}</td>
+          <td>{{ i.equipement.statut|badge_statut }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-secondary py-4">Aucune intervention enregistrée pour le moment.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if repartition %}
+{{ graphique|json_script:"donnees-categories" }}
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script>
+  (function () {
+    var d = JSON.parse(document.getElementById("donnees-categories").textContent);
+    var total = d.valeurs.reduce(function (a, b) { return a + b; }, 0);
+    new Chart(document.getElementById("graphique-categories"), {
+      type: "pie",
+      data: {
+        labels: d.libelles,
+        datasets: [{
+          data: d.valeurs,
+          backgroundColor: d.couleurs,
+          borderColor: "#ffffff",   // 2 px de séparation entre les parts
+          borderWidth: 2,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false },  // légende HTML à côté du graphique
+          tooltip: {
+            callbacks: {
+              label: function (ctx) {
+                var pct = Math.round(100 * ctx.parsed / total);
+                return " " + ctx.label + " : " + ctx.parsed + " équipement" + (ctx.parsed > 1 ? "s" : "") + " (" + pct + " %)";
+              }
+            }
+          }
+        }
+      }
+    });
+  })();
+</script>
+{% endif %}
+{% endblock %}

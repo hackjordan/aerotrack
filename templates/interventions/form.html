@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block titre %}Interventions{% endblock %}
+{% block titre_page %}{{ titre }}{% endblock %}
+
+{% block contenu %}
+<div class="at-card at-form-carte">
+  {% if technicien %}
+  <p class="text-secondary small mb-3">
+    <i data-lucide="hard-hat" class="at-icone-texte"></i>
+    Intervention enregistrée au nom de <strong>{{ technicien }}</strong>.
+  </p>
+  {% endif %}
+
+  <div class="alert alert-light border small mb-3" id="aide-corrective" hidden>
+    <strong>Intervention corrective :</strong> si la panne est résolue, l'équipement repassera
+    « Fonctionnel ». Sinon, il sera mis « En maintenance ».
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "includes/formulaire.html" %}
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <a href="{% if intervention %}{% url 'interventions:detail' intervention.pk %}{% else %}{% url 'interventions:liste' %}{% endif %}" class="btn btn-outline-secondary">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ types_correctifs|json_script:"types-correctifs" }}
+<script>
+  // La case « Panne résolue » ne s'affiche que pour un type d'intervention corrective.
+  (function () {
+    var correctifs = JSON.parse(document.getElementById("types-correctifs").textContent).map(String);
+    var selectType = document.getElementById("id_type");
+    var casePanne = document.getElementById("id_panne_resolue");
+    var aide = document.getElementById("aide-corrective");
+    if (!selectType || !casePanne) return;
+    var bloc = casePanne.closest(".form-check");
+
+    function maj() {
+      var corrective = correctifs.indexOf(selectType.value) !== -1;
+      bloc.hidden = !corrective;
+      aide.hidden = !corrective;
+      if (!corrective) casePanne.checked = false;
+    }
+    selectType.addEventListener("change", maj);
+    maj();
+  })();
+</script>
+{% endblock %}

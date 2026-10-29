@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block titre %}Accès refusé{% endblock %}
+{% block titre_page %}Accès refusé{% endblock %}
+
+{% block contenu %}
+<div class="at-card text-center py-5">
+  <i data-lucide="shield-alert" class="at-icone-erreur"></i>
+  <h2 class="h5 mt-3">Vous n'avez pas les droits nécessaires pour accéder à cette page.</h2>
+  <p class="text-secondary">Votre rôle : <strong>{{ role|default:"aucun" }}</strong>. Si vous pensez que c'est une erreur, contactez l'administrateur.</p>
+  <a href="{% url 'tableau_bord:accueil' %}" class="btn btn-primary">Retour au tableau de bord</a>
+</div>
+{% endblock %}

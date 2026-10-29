@@ -1,0 +1,18 @@
+{% extends "base_simple.html" %}
+
+{% block titre %}Connexion{% endblock %}
+
+{% block contenu %}
+<h1 class="h5 mb-3">Connexion</h1>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% include "includes/formulaire.html" %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+</form>
+
+<p class="text-secondary small mt-3 mb-0">
+  Mot de passe oublié ? Contactez l'administrateur de l'Unité RSI.
+</p>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load statuts %}
+
+{% block titre %}Équipements{% endblock %}
+{% block titre_page %}Équipements{% endblock %}
+
+{% block contenu %}
+<div class="at-card">
+  <div class="at-card-entete">
+    <h2 class="h6 mb-0">Liste des équipements</h2>
+    {% if est_admin %}
+    <a href="{% url 'equipements:ajouter' %}" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="plus"></i> Nouvel équipement
+    </a>
+    {% endif %}
+  </div>
+
+  {# ---------- Recherche et filtres (F2.5) ---------- #}
+  {% url 'equipements:liste' as url_reinitialiser %}
+  <form method="get" class="mb-3" role="search">
+    {% include "includes/barre_filtres.html" with placeholder="Rechercher par nom, n° de série ou marque" panneau_id="panneau-filtres" %}
+
+    <div class="collapse" id="panneau-filtres">
+      <div class="at-panneau-filtres">
+        <div>
+          <label for="f-cat" class="form-label">Catégorie</label>
+          <select id="f-cat" name="categorie" class="form-select form-select-sm" data-auto-submit>
+            <option value="">Toutes les catégories</option>
+            {% for c in categories %}<option value="{{ c.pk }}" {% if filtres.categorie == c.pk|stringformat:"d" %}selected{% endif %}>{{ c }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="f-type" class="form-label">Type</label>
+          <select id="f-type" name="type" class="form-select form-select-sm" data-auto-submit>
+            <option value="">Tous les types</option>
+            {% for t in types %}<option value="{{ t.pk }}" {% if filtres.type == t.pk|stringformat:"d" %}selected{% endif %}>{{ t }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="f-emp" class="form-label">Emplacement</label>
+          <select id="f-emp" name="emplacement" class="form-select form-select-sm" data-auto-submit>
+            <option value="">Tous les emplacements</option>
+            {% for e in emplacements %}<option value="{{ e.pk }}" {% if filtres.emplacement == e.pk|stringformat:"d" %}selected{% endif %}>{{ e }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="f-statut" class="form-label">Statut</label>
+          <select id="f-statut" name="statut" class="form-select form-select-sm" data-auto-submit>
+            <option value="">Tous les statuts</option>
+            {% for code, libelle in statuts %}<option value="{{ code }}" {% if filtres.statut == code %}selected{% endif %}>{{ libelle }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    {% include "includes/puces_filtres.html" %}
+  </form>
+
+  <p class="small text-secondary mb-2">
+    {{ page.paginator.count }} équipement{{ page.paginator.count|pluralize }}{% if filtre_actif %} trouvé{{ page.paginator.count|pluralize }}{% endif %}
+  </p>
+
+  {# ---------- Liste (F2.4) ---------- #}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle at-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>N° de série</th>
+          <th>Type</th>
+          <th>Emplacement</th>
+          <th>Statut</th>
+          <th class="text-end"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in page %}
+        <tr>
+          <td><a href="{% url 'equipements:detail' e.pk %}" class="fw-semibold text-decoration-none">{{ e.nom }}</a><div class="small text-secondary">{{ e.marque }}</div></td>
+          <td class="font-monospace small text-nowrap">{{ e.numero_serie }}</td>
+          <td>{{ e.type }}{% if e.type.categorie %}<div class="small text-secondary">{{ e.type.categorie }}</div>{% endif %}</td>
+          <td>{{ e.emplacement }}</td>
+          <td>{{ e.statut|badge_statut }}</td>
+          <td class="text-end"><a href="{% url 'equipements:detail' e.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir la fiche"><i data-lucide="eye"></i></a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-secondary py-4">
+          {% if filtre_actif %}Aucun équipement ne correspond à ces critères.{% else %}Aucun équipement enregistré pour le moment.{% endif %}
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

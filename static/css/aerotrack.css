@@ -1,0 +1,312 @@
+/* ============================================================
+   AéroTrack : charte graphique (cahier des charges § 8.3)
+   Bleu aéroportuaire, fond gris clair, police Inter,
+   vert = fonctionnel, rouge = en panne, orange = en maintenance
+   ============================================================ */
+
+@font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url("../vendor/inter/inter-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 500; font-display: swap; src: url("../vendor/inter/inter-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 600; font-display: swap; src: url("../vendor/inter/inter-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 700; font-display: swap; src: url("../vendor/inter/inter-latin-700-normal.woff2") format("woff2"); }
+
+:root {
+  /* Couleurs relevées sur le logo ASECNA */
+  --at-logo-or: #f8d848;
+  --at-logo-ciel: #0aa8e6;
+  --at-logo-marine: #0a2a80;
+
+  --at-bleu: #0b4f8a;
+  --at-bleu-fonce: #083a66;
+  --at-bleu-clair: #e7f0f9;
+  --at-fond: #f1f3f6;
+  --at-carte: #ffffff;
+  --at-bordure: #dde2e8;
+  --at-texte: #1d2733;
+  --at-texte-2: #5c6b7a;
+
+  --at-ok: #1e8e3e;
+  --at-ok-fond: #e6f4ea;
+  --at-panne: #d93025;
+  --at-panne-fond: #fce8e6;
+  --at-maint: #e37400;
+  --at-maint-fond: #fef3e0;
+
+  --at-sidebar-largeur: 220px;
+  --at-sidebar-fond: #0a2f5c;
+  --at-sidebar-actif: #1d4f8f;
+  --at-sidebar-repliee: 68px;
+
+  /* Bootstrap reprend la couleur principale de la charte */
+  --bs-primary: var(--at-bleu);
+  --bs-primary-rgb: 11, 79, 138;
+  --bs-body-font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --bs-body-color: var(--at-texte);
+  --bs-body-bg: var(--at-fond);
+  --bs-link-color: var(--at-bleu);
+  --bs-link-color-rgb: 11, 79, 138;
+  --bs-link-hover-color: var(--at-bleu-fonce);
+  --bs-link-hover-color-rgb: 8, 58, 102;
+}
+
+body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs-body-font-family); }
+
+.btn-primary { --bs-btn-bg: var(--at-bleu); --bs-btn-border-color: var(--at-bleu); --bs-btn-hover-bg: var(--at-bleu-fonce); --bs-btn-hover-border-color: var(--at-bleu-fonce); --bs-btn-active-bg: var(--at-bleu-fonce); }
+.btn-outline-primary { --bs-btn-color: var(--at-bleu); --bs-btn-border-color: var(--at-bleu); --bs-btn-hover-bg: var(--at-bleu); --bs-btn-hover-border-color: var(--at-bleu); --bs-btn-active-bg: var(--at-bleu-fonce); --bs-btn-active-border-color: var(--at-bleu-fonce); }
+.btn-link { --bs-btn-color: var(--at-bleu); --bs-btn-hover-color: var(--at-bleu-fonce); }
+.pagination { --bs-pagination-color: var(--at-bleu); --bs-pagination-hover-color: var(--at-bleu-fonce); --bs-pagination-focus-color: var(--at-bleu-fonce); }
+
+/* ---------- Mise en page ---------- */
+.at-layout { display: flex; min-height: 100vh; }
+
+.at-sidebar {
+  width: var(--at-sidebar-largeur);
+  flex-shrink: 0;
+  background: var(--at-sidebar-fond);
+  color: #fff;
+  padding: 1.5rem .75rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bas de la barre latérale : bouton de déconnexion */
+.at-sidebar-bas { margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.12); }
+.at-deconnexion { width: 100%; background: none; border: none; text-align: left; cursor: pointer; }
+.at-deconnexion:hover { background: rgba(217, 48, 37, .25); color: #fff; }
+
+/* Nom de l'application, comme sur la maquette : texte seul, l'icône n'apparaît que barre repliée */
+.at-brand {
+  display: flex; align-items: center; gap: .5rem;
+  color: #fff; text-decoration: none; font-weight: 700; font-size: 1.45rem; letter-spacing: -.01em;
+  padding: 0 .75rem; margin-bottom: 1.75rem;
+}
+.at-brand:hover { color: #fff; }
+/* Nom aux couleurs du logo : or et bleu ciel sur le bleu foncé de la barre */
+.at-brand .at-nom-aero { color: var(--at-logo-or); }
+.at-brand .at-nom-track { color: var(--at-logo-ciel); }
+/* Logo rond sur fond blanc : le rognage en cercle retire les coins blancs du JPG */
+.at-brand-logo { width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: #fff; object-fit: cover; }
+
+.at-nav { display: flex; flex-direction: column; gap: 2px; }
+.at-nav-link {
+  display: flex; align-items: center; gap: .65rem;
+  padding: .6rem .75rem; border-radius: 6px;
+  color: rgba(255,255,255,.88); text-decoration: none; font-size: .875rem; font-weight: 500;
+}
+.at-nav-link svg { width: 17px; height: 17px; flex-shrink: 0; }
+.at-nav-link:hover { background: rgba(255,255,255,.07); color: #fff; }
+.at-nav-link.active { background: var(--at-sidebar-actif); color: #fff; font-weight: 600; }
+.at-nav-link.disabled { color: rgba(255,255,255,.35); pointer-events: none; }
+
+.at-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.at-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--at-carte); border-bottom: 1px solid var(--at-bordure);
+  padding: .9rem 1.75rem;
+}
+.at-page-title { font-size: 1.25rem; font-weight: 600; margin: 0; }
+.at-topbar-left { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.at-topbar-actions { display: flex; gap: .5rem; align-items: center; }
+
+.at-content { padding: 1.5rem 1.75rem; }
+
+/* ---------- Bouton menu ---------- */
+.at-menu-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; flex-shrink: 0;
+  border: 1px solid var(--at-bordure); border-radius: 8px;
+  background: var(--at-carte); color: var(--at-texte);
+  cursor: pointer;
+}
+.at-menu-btn:hover { background: var(--at-bleu-clair); color: var(--at-bleu); border-color: var(--at-bleu-clair); }
+.at-menu-btn:focus-visible { outline: 2px solid var(--at-bleu); outline-offset: 2px; }
+.at-menu-btn svg { width: 20px; height: 20px; }
+
+/* Grand écran : barre latérale repliable en colonne d'icônes */
+/* L'animation n'est activée qu'après le chargement (classe ajoutée par aerotrack.js),
+   pour éviter que la barre glisse à chaque changement de page. */
+.at-layout.anime .at-sidebar { transition: width .2s ease, transform .2s ease; }
+
+@media (min-width: 992px) {
+  .at-layout.sidebar-repliee .at-sidebar { width: var(--at-sidebar-repliee); overflow-x: hidden; }
+  .at-layout.sidebar-repliee .at-nav-texte { display: none; }
+  .at-layout.sidebar-repliee .at-brand { justify-content: center; padding: 0; }
+  .at-layout.sidebar-repliee .at-nav-link { justify-content: center; padding: .6rem 0; }
+  .at-layout.sidebar-repliee .at-nav-link svg { width: 20px; height: 20px; }
+}
+
+/* Voile sombre (petit écran uniquement) */
+.at-overlay { display: none; }
+
+/* Petit écran : barre latérale en surimpression */
+@media (max-width: 991.98px) {
+  .at-sidebar {
+    position: fixed; left: 0; top: 0; z-index: 1040;
+    transform: translateX(-100%);
+  }
+  .at-layout.sidebar-ouverte .at-sidebar { transform: translateX(0); }
+  .at-layout.sidebar-ouverte .at-overlay {
+    display: block; position: fixed; inset: 0; z-index: 1030;
+    background: rgba(8, 20, 35, .45);
+  }
+  .at-topbar { padding: .75rem 1rem; }
+  .at-content { padding: 1rem; }
+}
+
+/* ---------- Cartes et indicateurs ---------- */
+.at-card { background: var(--at-carte); border: 1px solid var(--at-bordure); border-radius: 10px; padding: 1.25rem; }
+
+.at-stat { display: flex; flex-direction: column; gap: .25rem; border-left: 4px solid var(--at-bleu); }
+.at-stat-label { font-size: .85rem; color: var(--at-texte-2); }
+.at-stat-value { font-size: 1.9rem; font-weight: 700; }
+.at-stat-ok    { border-left-color: var(--at-ok); }
+.at-stat-panne { border-left-color: var(--at-panne); }
+.at-stat-maint { border-left-color: var(--at-maint); }
+
+/* ---------- Menu utilisateur (barre du haut) ---------- */
+.at-user-btn {
+  display: flex; align-items: center; gap: .6rem;
+  background: none; border: 1px solid transparent; border-radius: 8px;
+  padding: .3rem .5rem; color: var(--at-texte); cursor: pointer; text-align: left;
+}
+.at-user-btn:hover, .at-user-btn[aria-expanded="true"] { background: var(--at-fond); border-color: var(--at-bordure); }
+.at-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--at-bleu); color: #fff; font-weight: 600; font-size: .85rem;
+}
+.at-user-info { display: flex; flex-direction: column; line-height: 1.15; }
+.at-user-nom { font-weight: 600; font-size: .9rem; }
+.at-user-role { font-size: .75rem; color: var(--at-texte-2); }
+.at-user-chevron { width: 16px; height: 16px; color: var(--at-texte-2); }
+.at-dropdown-item { display: flex; align-items: center; gap: .5rem; }
+.at-dropdown-item svg { width: 16px; height: 16px; }
+@media (max-width: 575.98px) { .at-user-info, .at-user-chevron { display: none; } }
+
+/* ---------- Pages simples (connexion, erreurs) ---------- */
+.at-simple {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(160deg, var(--at-bleu-fonce) 0%, var(--at-bleu) 100%);
+}
+.at-simple-carte { width: 100%; max-width: 400px; background: var(--at-carte); border-radius: 12px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+.at-simple-logo { display: block; width: 88px; height: 88px; margin: 0 auto .75rem; border-radius: 50%; object-fit: cover; }
+.at-simple-marque { text-align: center; font-size: 1.5rem; font-weight: 700; color: var(--at-bleu); }
+/* Sur fond blanc, l'or du logo serait illisible : marine du logo et bleu ciel assombri */
+.at-simple-marque .at-nom-aero { color: var(--at-logo-marine); }
+.at-simple-marque .at-nom-track { color: #0678b0; }
+.at-simple-sous-titre { text-align: center; color: var(--at-texte-2); font-size: .85rem; margin-bottom: 1.5rem; }
+
+/* ---------- Formulaires et tableaux ---------- */
+/* Bootstrap colore les champs avec le fond de page (gris) : on les garde blancs. */
+.form-control, .form-select { background-color: var(--at-carte); }
+.form-control:disabled, .form-select:disabled { background-color: var(--at-fond); }
+/* Formulaires centrés horizontalement dans la page */
+.at-form-carte { max-width: 640px; margin-left: auto; margin-right: auto; }
+.at-table th { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: var(--at-texte-2); font-weight: 600; }
+.at-table .btn svg { width: 16px; height: 16px; }
+/* En-tête de carte : titre à gauche, bouton d'ajout à droite */
+.at-card-entete { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+.at-card-entete .btn svg { width: 16px; height: 16px; }
+.at-topbar-actions .btn svg { width: 16px; height: 16px; }
+.at-icone-erreur { width: 48px; height: 48px; color: var(--at-panne); }
+
+/* ---------- Fiche équipement ---------- */
+.at-fiche dt { font-weight: 500; color: var(--at-texte-2); }
+.at-fiche dd { margin-bottom: .6rem; }
+.at-statut-grand .at-badge { font-size: 1rem; padding: .4rem 1rem; }
+
+/* ---------- Filtres compacts des listes ---------- */
+.at-filtres-barre { display: flex; gap: .5rem; }
+.at-recherche { position: relative; flex: 1; max-width: 520px; }
+.at-recherche svg { position: absolute; left: .7rem; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--at-texte-2); pointer-events: none; }
+.at-recherche .form-control { padding-left: 2.3rem; }
+.at-btn-filtres svg { width: 16px; height: 16px; }
+.at-btn-filtres .badge { font-size: .7rem; }
+.at-panneau-filtres {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: .75rem;
+  margin-top: .75rem; padding: .9rem 1rem; background: var(--at-fond); border-radius: 8px;
+}
+.at-panneau-filtres .form-label { font-size: .8rem; color: var(--at-texte-2); margin-bottom: .25rem; }
+.at-puces { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-top: .75rem; }
+.at-puce {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .2rem .4rem .2rem .7rem; border-radius: 999px;
+  background: var(--at-bleu-clair); color: var(--at-bleu); font-size: .8rem; font-weight: 500; text-decoration: none;
+}
+.at-puce svg { width: 14px; height: 14px; }
+.at-puce:hover { background: var(--at-bleu); color: #fff; }
+.at-puce:hover .text-secondary { color: rgba(255,255,255,.8) !important; }
+.at-puces-effacer { font-size: .8rem; margin-left: .25rem; }
+
+/* ---------- Tableau de bord ---------- */
+/* Cartes compteurs pleines, couleur du statut, texte blanc.
+   Teintes assombries pour garder un contraste suffisant avec le blanc. */
+.at-compteur {
+  display: flex; align-items: center; gap: 1rem;
+  border: none; color: #fff; text-decoration: none;
+  padding: 1.35rem 1.25rem;
+  box-shadow: 0 2px 6px rgba(10, 47, 92, .12);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.at-compteur:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(10, 47, 92, .2); }
+.at-compteur-total { background: var(--at-bleu); }
+.at-compteur-ok    { background: #1b7f37; }
+.at-compteur-panne { background: #c62828; }
+.at-compteur-maint { background: #b85c00; }
+.at-compteur-icone {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; border-radius: 12px; flex-shrink: 0;
+  background: rgba(255, 255, 255, .18); color: #fff;
+}
+.at-compteur-icone svg { width: 26px; height: 26px; }
+.at-compteur-valeur { display: block; font-size: 2rem; font-weight: 700; line-height: 1.1; }
+.at-compteur-libelle { display: block; font-size: .9rem; font-weight: 500; color: rgba(255, 255, 255, .92); }
+
+.at-camembert { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; }
+.at-camembert-graphique { width: 210px; max-width: 100%; }
+.at-legende { list-style: none; padding: 0; margin: 0; flex: 1; min-width: 200px; }
+.at-legende a { display: flex; align-items: center; gap: .6rem; padding: .35rem .4rem; border-radius: 6px; color: var(--at-texte); text-decoration: none; font-size: .875rem; }
+.at-legende a:hover { background: var(--at-fond); }
+.at-legende-pastille { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.at-legende-nom { flex: 1; }
+.at-legende-valeur { font-weight: 600; white-space: nowrap; }
+
+.at-liste-simple { list-style: none; padding: 0; margin: 0; }
+.at-liste-simple li + li { border-top: 1px solid var(--at-bordure); }
+.at-liste-simple a { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .6rem .25rem; color: var(--at-texte); text-decoration: none; }
+.at-liste-simple a:hover { background: var(--at-fond); }
+.at-vide { display: flex; align-items: center; gap: .5rem; color: var(--at-ok); margin: 0; }
+.at-vide svg { width: 18px; height: 18px; }
+
+/* ---------- Compteurs cliquables (emplacements) ---------- */
+.at-stat-lien { text-decoration: none; color: inherit; transition: box-shadow .15s ease; }
+.at-stat-lien:hover { color: inherit; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+
+/* ---------- Onglets des référentiels ---------- */
+.at-onglets .nav-link { color: var(--at-texte-2); }
+.at-onglets .nav-link.active { color: var(--at-bleu); font-weight: 600; background: var(--at-carte); }
+.at-onglets .nav-link svg { width: 16px; height: 16px; }
+
+/* ---------- Interventions ---------- */
+.at-pannes { display: flex; flex-wrap: wrap; gap: .5rem 2rem; align-items: baseline; padding: .75rem 1rem; background: var(--at-fond); border-radius: 8px; font-size: .9rem; }
+.at-pannes-chiffre { font-size: 1.25rem; font-weight: 700; margin-right: .25rem; }
+.at-type-corrective { font-weight: 600; }
+.at-texte-maint { color: var(--at-maint); }
+.at-icone-texte { width: 16px; height: 16px; vertical-align: -3px; }
+
+/* ---------- Rôles ---------- */
+.at-role { display: inline-block; padding: .15rem .55rem; border-radius: 6px; font-size: .8rem; font-weight: 600; }
+.at-role-administrateur { background: var(--at-bleu-clair); color: var(--at-bleu); }
+.at-role-technicien { background: #eef1f4; color: #36454f; }
+
+/* ---------- Badges de statut ---------- */
+.at-badge { display: inline-block; white-space: nowrap; padding: .2rem .6rem; border-radius: 999px; font-size: .8rem; font-weight: 600; }
+.at-badge-ok    { background: var(--at-ok-fond);    color: var(--at-ok); }
+.at-badge-panne { background: var(--at-panne-fond); color: var(--at-panne); }
+.at-badge-maint { background: var(--at-maint-fond); color: var(--at-maint); }
+.at-badge-inactif { background: #eceff1; color: #6b7785; }

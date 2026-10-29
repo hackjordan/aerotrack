@@ -1,0 +1,10 @@
+{# Onglets communs aux quatre référentiels #}
+<ul class="nav nav-tabs at-onglets mb-3">
+  {% for c, titre_onglet, icone in onglets %}
+  <li class="nav-item">
+    <a class="nav-link d-flex align-items-center gap-1 {% if c == cle %}active{% endif %}" href="{% url 'referentiels:liste' c %}">
+      <i data-lucide="{{ icone }}"></i> {{ titre_onglet }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>

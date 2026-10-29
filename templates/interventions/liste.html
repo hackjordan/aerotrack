@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block titre %}Interventions{% endblock %}
+{% block titre_page %}Interventions{% endblock %}
+
+{% block contenu %}
+<div class="at-card">
+  <div class="at-card-entete">
+    <h2 class="h6 mb-0">Liste des interventions</h2>
+    {% if peut_saisir %}
+    <a href="{% url 'interventions:ajouter' %}{% if equipement_filtre %}?equipement={{ equipement_filtre.pk }}{% endif %}" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="plus"></i> Nouvelle intervention
+    </a>
+    {% endif %}
+  </div>
+
+  {# ---------- Recherche et filtres (F4.3) ---------- #}
+  {% url 'interventions:liste' as url_reinitialiser %}
+  <form method="get" class="mb-3" role="search">
+    {% if equipement_filtre %}<input type="hidden" name="equipement" value="{{ equipement_filtre.pk }}">{% endif %}
+    {% include "includes/barre_filtres.html" with placeholder="Rechercher par équipement, n° de série ou commentaire" panneau_id="panneau-filtres" %}
+
+    <div class="collapse" id="panneau-filtres">
+      <div class="at-panneau-filtres">
+        <div>
+          <label for="f-du" class="form-label">Du</label>
+          <input type="date" id="f-du" name="du" value="{{ filtres.du }}" class="form-control form-control-sm" data-auto-submit>
+        </div>
+        <div>
+          <label for="f-au" class="form-label">Au</label>
+          <input type="date" id="f-au" name="au" value="{{ filtres.au }}" class="form-control form-control-sm" data-auto-submit>
+        </div>
+        <div>
+          <label for="f-tech" class="form-label">Technicien</label>
+          <select id="f-tech" name="technicien" class="form-select form-select-sm" data-auto-submit>
+            <option value="">Tous les techniciens</option>
+            {% for t in techniciens %}<option value="{{ t.pk }}" {% if filtres.technicien == t.pk|stringformat:"d" %}selected{% endif %}>{{ t }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="f-type" class="form-label">Type</label>
+          <select id="f-type" name="type" class="form-select form-select-sm" data-auto-submit>
+            <option value="">Tous les types</option>
+            {% for t in types %}<option value="{{ t.pk }}" {% if filtres.type == t.pk|stringformat:"d" %}selected{% endif %}>{{ t }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    {% include "includes/puces_filtres.html" %}
+  </form>
+
+  <p class="small text-secondary mb-2">
+    {{ page.paginator.count }} intervention{{ page.paginator.count|pluralize }}{% if filtre_actif %} trouvée{{ page.paginator.count|pluralize }}{% endif %}
+  </p>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle at-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Équipement</th>
+          <th>Type</th>
+          <th>Technicien</th>
+          <th>Commentaire</th>
+          <th class="text-end"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in page %}
+        <tr>
+          <td class="text-nowrap">{{ i.date|date:"d/m/Y" }}</td>
+          <td>
+            <a href="{% url 'equipements:detail' i.equipement.pk %}" class="fw-semibold text-decoration-none">{{ i.equipement.nom }}</a>
+            <div class="small text-secondary">{{ i.equipement.emplacement }}</div>
+          </td>
+          <td>{% include "interventions/_type.html" with intervention=i %}</td>
+          <td>{{ i.technicien }}</td>
+          <td class="small">{{ i.commentaire|truncatechars:70|default:"—" }}</td>
+          <td class="text-end text-nowrap">
+            <a href="{% url 'interventions:detail' i.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir"><i data-lucide="eye"></i></a>
+            {% if i.modifiable %}
+            <a href="{% url 'interventions:modifier' i.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i data-lucide="pencil"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-secondary py-4">
+          {% if filtre_actif %}Aucune intervention ne correspond à ces critères.{% else %}Aucune intervention enregistrée pour le moment.{% endif %}
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

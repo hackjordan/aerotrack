@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titre %}Mon mot de passe{% endblock %}
+{% block titre_page %}Changer mon mot de passe{% endblock %}
+
+{% block contenu %}
+<div class="at-card at-form-carte">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "includes/formulaire.html" %}
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <a href="{% url 'tableau_bord:accueil' %}" class="btn btn-outline-secondary">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

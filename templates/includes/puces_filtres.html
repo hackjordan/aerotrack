@@ -1,0 +1,12 @@
+{# Étiquettes des filtres actifs. Contexte : puces, url_reinitialiser. #}
+{% if puces %}
+<div class="at-puces">
+  {% for p in puces %}
+  <a class="at-puce" href="{{ p.url_retrait }}" title="Retirer ce filtre">
+    <span class="text-secondary">{{ p.libelle }} :</span> {{ p.valeur }}
+    <i data-lucide="x"></i>
+  </a>
+  {% endfor %}
+  {% if puces|length > 1 %}<a href="{{ url_reinitialiser }}" class="at-puces-effacer">Tout effacer</a>{% endif %}
+</div>
+{% endif %}

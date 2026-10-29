@@ -1,0 +1,9 @@
+{% extends "base_simple.html" %}
+
+{% block titre %}Page introuvable{% endblock %}
+
+{% block contenu %}
+<h1 class="h5">Page introuvable</h1>
+<p class="text-secondary">L'adresse demandée n'existe pas ou l'élément a été supprimé.</p>
+<a href="{% url 'tableau_bord:accueil' %}" class="btn btn-primary w-100">Retour à l'accueil</a>
+{% endblock %}

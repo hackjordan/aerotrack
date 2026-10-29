@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load statuts %}
+
+{% block titre %}Intervention du {{ intervention.date|date:"d/m/Y" }}{% endblock %}
+{% block titre_page %}Intervention du {{ intervention.date|date:"d/m/Y" }}{% endblock %}
+
+{% block actions %}
+<a href="{% url 'interventions:liste' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+  <i data-lucide="arrow-left"></i> Liste
+</a>
+{% if modifiable %}
+<a href="{% url 'interventions:modifier' intervention.pk %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
+  <i data-lucide="pencil"></i> Modifier
+</a>
+{% endif %}
+{% endblock %}
+
+{% block contenu %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="at-card h-100">
+      <h2 class="h6 mb-3">Détails</h2>
+      <dl class="row mb-0 at-fiche">
+        <dt class="col-sm-4">Date</dt><dd class="col-sm-8">{{ intervention.date|date:"l d F Y"|capfirst }}</dd>
+        <dt class="col-sm-4">Type</dt><dd class="col-sm-8">{% include "interventions/_type.html" %}</dd>
+        <dt class="col-sm-4">Technicien</dt><dd class="col-sm-8">{{ intervention.technicien }} <span class="text-secondary">· {{ intervention.technicien.unite }}</span></dd>
+        <dt class="col-sm-4">Commentaire</dt><dd class="col-sm-8">{{ intervention.commentaire|linebreaksbr|default:"—" }}</dd>
+        <dt class="col-sm-4">Saisie</dt>
+        <dd class="col-sm-8 text-secondary">
+          le {{ intervention.cree_le|date:"d/m/Y à H:i" }}{% if intervention.cree_par %} par {{ intervention.cree_par.get_full_name|default:intervention.cree_par.username }}{% endif %}
+          {% if intervention.modifie_le|date:"YmdHi" != intervention.cree_le|date:"YmdHi" %}<br>modifiée le {{ intervention.modifie_le|date:"d/m/Y à H:i" }}{% endif %}
+        </dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="at-card h-100">
+      <h2 class="h6 mb-3">Équipement</h2>
+      <p class="mb-1"><a href="{% url 'equipements:detail' intervention.equipement.pk %}" class="fw-semibold text-decoration-none">{{ intervention.equipement.nom }}</a></p>
+      <p class="font-monospace small mb-1">{{ intervention.equipement.numero_serie }}</p>
+      <p class="text-secondary small">{{ intervention.equipement.emplacement }}</p>
+      <p class="mb-0">Statut actuel : {{ intervention.equipement.statut|badge_statut }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

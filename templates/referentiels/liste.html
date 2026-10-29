@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block titre %}{{ ref.titre }}{% endblock %}
+{% block titre_page %}Référentiels{% endblock %}
+
+{% block contenu %}
+{% include "referentiels/_onglets.html" %}
+
+<div class="at-card">
+  <div class="at-card-entete">
+    <h2 class="h6 mb-0">{{ ref.titre }}</h2>
+    {% if est_admin %}
+    <a href="{% url 'referentiels:ajouter' cle %}" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="plus"></i> Ajouter
+    </a>
+    {% endif %}
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle at-table">
+      <thead>
+        <tr>
+          {% for entete in entetes %}<th>{{ entete }}</th>{% endfor %}
+          <th>{{ ref.libelle_relation }}</th>
+          {% if est_admin %}<th class="text-end"></th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for objet, valeurs in lignes %}
+        <tr>
+          {% for valeur in valeurs %}<td{% if forloop.first %} class="fw-semibold"{% endif %}>{{ valeur }}</td>{% endfor %}
+          <td>{{ objet.nb_utilisations }}</td>
+          {% if est_admin %}
+          <td class="text-end text-nowrap">
+            <a href="{% url 'referentiels:modifier' cle objet.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i data-lucide="pencil"></i></a>
+            <a href="{% url 'referentiels:supprimer' cle objet.pk %}" class="btn btn-sm btn-outline-danger" title="Supprimer"><i data-lucide="trash-2"></i></a>
+          </td>
+          {% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="{{ entetes|length|add:2 }}" class="text-center text-secondary py-4">Aucun élément enregistré.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

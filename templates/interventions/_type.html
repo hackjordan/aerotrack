@@ -1,0 +1,11 @@
+{# Type d'intervention ; pour une corrective, indique si la panne est résolue. #}
+{% if intervention.type.est_corrective %}
+  <span class="at-type-corrective">{{ intervention.type }}</span>
+  {% if intervention.panne_resolue %}
+    <div class="small text-success">Panne résolue</div>
+  {% else %}
+    <div class="small at-texte-maint">Panne non résolue</div>
+  {% endif %}
+{% else %}
+  {{ intervention.type }}
+{% endif %}

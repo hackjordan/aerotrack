@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block titre %}Supprimer {{ equipement.nom }}{% endblock %}
+{% block titre_page %}Supprimer un équipement{% endblock %}
+
+{% block contenu %}
+<div class="at-card at-form-carte">
+  {% if nb_interventions %}
+    <div class="alert alert-warning mb-3">
+      Cet équipement possède <strong>{{ nb_interventions }} intervention{{ nb_interventions|pluralize }}</strong>.
+      Il ne peut pas être supprimé, pour conserver son historique.
+      Vous pouvez en revanche modifier sa fiche ou son statut.
+    </div>
+    <a href="{% url 'equipements:detail' equipement.pk %}" class="btn btn-outline-secondary">Retour à la fiche</a>
+  {% else %}
+    <p>Voulez-vous vraiment supprimer l'équipement suivant ? Cette action est <strong>définitive</strong>.</p>
+    <ul class="mb-4">
+      <li><strong>{{ equipement.nom }}</strong></li>
+      <li>N° de série : <span class="font-monospace">{{ equipement.numero_serie }}</span></li>
+      <li>Emplacement : {{ equipement.emplacement }}</li>
+    </ul>
+    <form method="post" class="d-flex gap-2">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+      <a href="{% url 'equipements:detail' equipement.pk %}" class="btn btn-outline-secondary">Annuler</a>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

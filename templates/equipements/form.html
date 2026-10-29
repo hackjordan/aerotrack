@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titre %}Équipements{% endblock %}
+{% block titre_page %}{{ titre }}{% endblock %}
+
+{% block contenu %}
+<div class="at-card at-form-carte">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "includes/formulaire.html" %}
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <a href="{% if equipement %}{% url 'equipements:detail' equipement.pk %}{% else %}{% url 'equipements:liste' %}{% endif %}" class="btn btn-outline-secondary">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
