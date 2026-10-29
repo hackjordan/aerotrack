@@ -201,6 +201,17 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
 .at-simple-marque .at-nom-track { color: #0678b0; }
 .at-simple-sous-titre { text-align: center; color: var(--at-texte-2); font-size: .85rem; margin-bottom: 1.5rem; }
 
+/* Connexion : photo de la tour de Douala sous un voile transparent aux couleurs du logo */
+.at-connexion {
+  background:
+    linear-gradient(110deg, rgba(10, 168, 230, .35) 0%, rgba(10, 42, 128, .85) 100%),
+    url("../img/tour-douala.jpg") center top / cover no-repeat;
+}
+/* Grand écran : carte à droite pour laisser voir la tour */
+@media (min-width: 992px) {
+  .at-connexion { justify-content: flex-end; padding-right: 8vw; }
+}
+
 /* ---------- Formulaires et tableaux ---------- */
 /* Bootstrap colore les champs avec le fond de page (gris) : on les garde blancs. */
 .form-control, .form-select { background-color: var(--at-carte); }

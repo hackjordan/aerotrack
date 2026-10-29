@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/aerotrack.css' %}">
 </head>
-<body class="at-simple">
+<body class="at-simple {% block classe_page %}{% endblock %}">
   {# Gabarit sans barre latérale : page de connexion et pages d'erreur. #}
   <main class="at-simple-carte">
     <img src="{% static 'img/logo-asecna.jpg' %}" alt="Logo ASECNA" class="at-simple-logo">
