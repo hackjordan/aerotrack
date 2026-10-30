@@ -36,13 +36,13 @@
         {% for u in page %}
         <tr>
           <td class="fw-semibold">{{ u.username }}</td>
-          <td>{{ u.last_name|upper }} {{ u.first_name }}</td>
-          <td>{% if u.role %}<span class="at-role at-role-{{ u.role|lower }}">{{ u.role }}</span>{% else %}<span class="text-secondary">Aucun</span>{% endif %}</td>
-          <td>
+          <td data-label="Nom et prénom">{{ u.last_name|upper }} {{ u.first_name }}</td>
+          <td data-label="Rôle">{% if u.role %}<span class="at-role at-role-{{ u.role|lower }}">{{ u.role }}</span>{% else %}<span class="text-secondary">Aucun</span>{% endif %}</td>
+          <td data-label="État">
             {% if u.is_active %}<span class="at-badge at-badge-ok">Actif</span>
             {% else %}<span class="at-badge at-badge-inactif">Désactivé</span>{% endif %}
           </td>
-          <td class="text-secondary">{{ u.last_login|date:"d/m/Y H:i"|default:"Jamais" }}</td>
+          <td class="text-secondary" data-label="Dernière connexion">{{ u.last_login|date:"d/m/Y H:i"|default:"Jamais" }}</td>
           <td class="text-end text-nowrap">
             <a href="{% url 'comptes:modifier' u.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i data-lucide="pencil"></i></a>
             <a href="{% url 'comptes:reinitialiser' u.pk %}" class="btn btn-sm btn-outline-secondary" title="Réinitialiser le mot de passe"><i data-lucide="key-round"></i></a>

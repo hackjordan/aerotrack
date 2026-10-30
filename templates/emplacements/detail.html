@@ -4,25 +4,27 @@
 {% block titre %}{{ emplacement }}{% endblock %}
 {% block titre_page %}{{ emplacement }}{% endblock %}
 
-{% block actions %}
-<a href="{% url 'emplacements:liste' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
-  <i data-lucide="arrow-left"></i> Liste
-</a>
-{% if est_admin %}
-<a href="{% url 'emplacements:modifier' emplacement.pk %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
-  <i data-lucide="pencil"></i> Modifier
-</a>
-<a href="{% url 'emplacements:supprimer' emplacement.pk %}" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1">
-  <i data-lucide="trash-2"></i> Supprimer
-</a>
-{% endif %}
-{% endblock %}
-
 {% block contenu %}
+<div class="at-actions-page">
+  <a href="{% url 'emplacements:liste' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+    <i data-lucide="arrow-left"></i> Liste
+  </a>
+  {% if est_admin %}
+  <div class="at-actions-page-droite">
+    <a href="{% url 'emplacements:modifier' emplacement.pk %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="pencil"></i> Modifier
+    </a>
+    <a href="{% url 'emplacements:supprimer' emplacement.pk %}" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="trash-2"></i> Supprimer
+    </a>
+  </div>
+  {% endif %}
+</div>
+
 <div class="row g-3 mb-3">
   {% for code, libelle, nombre in compteurs %}
-  <div class="col-md-4">
-    <a class="at-card at-stat at-stat-lien {% if code == 'FONCTIONNEL' %}at-stat-ok{% elif code == 'EN_PANNE' %}at-stat-panne{% else %}at-stat-maint{% endif %}"
+  <div class="col-4">
+    <a class="at-card at-stat at-stat-lien h-100 {% if code == 'FONCTIONNEL' %}at-stat-ok{% elif code == 'EN_PANNE' %}at-stat-panne{% else %}at-stat-maint{% endif %}"
        href="{% url 'equipements:liste' %}?emplacement={{ emplacement.pk }}&amp;statut={{ code }}">
       <span class="at-stat-label">{{ libelle }}</span>
       <span class="at-stat-value">{{ nombre }}</span>
@@ -41,9 +43,9 @@
         {% for e in page %}
         <tr>
           <td><a href="{% url 'equipements:detail' e.pk %}" class="fw-semibold text-decoration-none">{{ e.nom }}</a></td>
-          <td class="font-monospace small text-nowrap">{{ e.numero_serie }}</td>
-          <td>{{ e.type }}</td>
-          <td>{{ e.statut|badge_statut }}</td>
+          <td class="font-monospace small text-nowrap" data-label="N° de série">{{ e.numero_serie }}</td>
+          <td data-label="Type">{{ e.type }}</td>
+          <td data-label="Statut">{{ e.statut|badge_statut }}</td>
           <td class="text-end"><a href="{% url 'equipements:detail' e.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir la fiche"><i data-lucide="eye"></i></a></td>
         </tr>
         {% empty %}

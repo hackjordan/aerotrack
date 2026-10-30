@@ -104,7 +104,8 @@ def liste(request, cle):
     elif ref.modele is TypeEquipement:
         objets = objets.select_related("categorie")
     page = Paginator(objets, 30).get_page(request.GET.get("page"))
-    lignes = [(obj, [valeur(obj) for _, valeur in ref.colonnes]) for obj in page]
+    # (libellé, valeur) : le libellé sert d'étiquette quand le tableau passe en cartes sur téléphone.
+    lignes = [(obj, [(libelle, valeur(obj)) for libelle, valeur in ref.colonnes]) for obj in page]
     return render(request, "referentiels/liste.html", {
         **contexte_commun(cle, ref),
         "page": page,

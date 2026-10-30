@@ -4,18 +4,20 @@
 {% block titre %}Intervention du {{ intervention.date|date:"d/m/Y" }}{% endblock %}
 {% block titre_page %}Intervention du {{ intervention.date|date:"d/m/Y" }}{% endblock %}
 
-{% block actions %}
-<a href="{% url 'interventions:liste' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
-  <i data-lucide="arrow-left"></i> Liste
-</a>
-{% if modifiable %}
-<a href="{% url 'interventions:modifier' intervention.pk %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
-  <i data-lucide="pencil"></i> Modifier
-</a>
-{% endif %}
-{% endblock %}
-
 {% block contenu %}
+<div class="at-actions-page">
+  <a href="{% url 'interventions:liste' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+    <i data-lucide="arrow-left"></i> Liste
+  </a>
+  {% if modifiable %}
+  <div class="at-actions-page-droite">
+    <a href="{% url 'interventions:modifier' intervention.pk %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="pencil"></i> Modifier
+    </a>
+  </div>
+  {% endif %}
+</div>
+
 <div class="row g-3">
   <div class="col-lg-8">
     <div class="at-card h-100">

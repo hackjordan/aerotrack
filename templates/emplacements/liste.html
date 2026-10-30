@@ -31,9 +31,9 @@
         {% for e in page %}
         <tr>
           <td class="fw-semibold">{{ e.batiment }}</td>
-          <td>{{ e.zone }}</td>
-          <td>{{ e.nb_equipements }}</td>
-          <td>{% if e.nb_pannes %}<span class="at-badge at-badge-panne">{{ e.nb_pannes }}</span>{% else %}<span class="text-secondary">0</span>{% endif %}</td>
+          <td data-label="Zone">{{ e.zone }}</td>
+          <td data-label="Équipements">{{ e.nb_equipements }}</td>
+          <td data-label="En panne">{% if e.nb_pannes %}<span class="at-badge at-badge-panne">{{ e.nb_pannes }}</span>{% else %}<span class="text-secondary">0</span>{% endif %}</td>
           <td class="text-end text-nowrap">
             <a href="{% url 'emplacements:detail' e.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir les équipements"><i data-lucide="eye"></i></a>
             {% if est_admin %}

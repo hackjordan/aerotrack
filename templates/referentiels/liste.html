@@ -28,8 +28,8 @@
       <tbody>
         {% for objet, valeurs in lignes %}
         <tr>
-          {% for valeur in valeurs %}<td{% if forloop.first %} class="fw-semibold"{% endif %}>{{ valeur }}</td>{% endfor %}
-          <td>{{ objet.nb_utilisations }}</td>
+          {% for libelle, valeur in valeurs %}<td{% if forloop.first %} class="fw-semibold"{% else %} data-label="{{ libelle }}"{% endif %}>{{ valeur }}</td>{% endfor %}
+          <td data-label="{{ ref.libelle_relation }}">{{ objet.nb_utilisations }}</td>
           {% if est_admin %}
           <td class="text-end text-nowrap">
             <a href="{% url 'referentiels:modifier' cle objet.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i data-lucide="pencil"></i></a>

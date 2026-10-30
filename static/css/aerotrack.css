@@ -155,10 +155,13 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
   }
   .at-topbar { padding: .75rem 1rem; }
   .at-content { padding: 1rem; }
+  /* Titre long (nom d'un équipement) : une seule ligne, coupée par « … » */
+  .at-page-title { font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 
 /* ---------- Cartes et indicateurs ---------- */
 .at-card { background: var(--at-carte); border: 1px solid var(--at-bordure); border-radius: 10px; padding: 1.25rem; }
+@media (max-width: 575.98px) { .at-card { padding: 1rem; } }
 
 .at-stat { display: flex; flex-direction: column; gap: .25rem; border-left: 4px solid var(--at-bleu); }
 .at-stat-label { font-size: .85rem; color: var(--at-texte-2); }
@@ -166,6 +169,10 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
 .at-stat-ok    { border-left-color: var(--at-ok); }
 .at-stat-panne { border-left-color: var(--at-panne); }
 .at-stat-maint { border-left-color: var(--at-maint); }
+@media (max-width: 575.98px) {
+  .at-stat-label { font-size: .8rem; }
+  .at-stat-value { font-size: 1.5rem; }
+}
 
 /* ---------- Menu utilisateur (barre du haut) ---------- */
 .at-user-btn {
@@ -219,7 +226,34 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
 /* En-tête de carte : titre à gauche, bouton d'ajout à droite */
 .at-card-entete { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: 1rem; }
 .at-card-entete .btn svg { width: 16px; height: 16px; }
-.at-topbar-actions .btn svg { width: 16px; height: 16px; }
+/* Pages détail : retour à la liste à gauche, modifier / supprimer à droite */
+.at-actions-page { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+.at-actions-page-droite { display: flex; gap: .5rem; }
+.at-actions-page .btn svg { width: 16px; height: 16px; }
+
+/* Tablette : colonnes un peu plus serrées pour que les tableaux tiennent sans défiler */
+@media (max-width: 991.98px) {
+  .at-table > :not(caption) > * > * { padding-left: .35rem; padding-right: .35rem; }
+}
+
+/* Petit écran : chaque ligne de tableau devient une carte « libellé : valeur ».
+   Le libellé vient de l'attribut data-label de la cellule ; une cellule sans
+   libellé (nom de l'objet, boutons) occupe toute la largeur. */
+@media (max-width: 767.98px) {
+  .at-table thead { display: none; }
+  .at-table, .at-table tbody, .at-table tr, .at-table td { display: block; width: 100%; }
+  .at-table tr { padding: .6rem 0; border-bottom: 1px solid var(--at-bordure); }
+  .at-table > :not(caption) > * > * { padding: .2rem 0; border-bottom-width: 0; background-color: transparent; }
+  /* Libellé flottant dans la marge gauche ; ::after garde la cellule au moins
+     aussi haute que lui (valeur vide ou libellé sur deux lignes). */
+  .at-table td[data-label] { padding-left: 7.5rem; }
+  .at-table td[data-label]::before {
+    content: attr(data-label);
+    float: left; width: 7rem; margin-left: -7.5rem; padding-top: .1rem;
+    font-family: var(--bs-body-font-family); font-size: .8rem; color: var(--at-texte-2);
+  }
+  .at-table td[data-label]::after { content: ""; display: block; clear: both; }
+}
 .at-icone-erreur { width: 48px; height: 48px; color: var(--at-panne); }
 
 /* ---------- Fiche équipement ---------- */
@@ -273,6 +307,14 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
 .at-compteur-icone svg { width: 26px; height: 26px; }
 .at-compteur-valeur { display: block; font-size: 2rem; font-weight: 700; line-height: 1.1; }
 .at-compteur-libelle { display: block; font-size: .9rem; font-weight: 500; color: rgba(255, 255, 255, .92); }
+/* Téléphone : 2 compteurs par ligne, icône au-dessus du chiffre */
+@media (max-width: 575.98px) {
+  .at-compteur { flex-direction: column; align-items: flex-start; gap: .6rem; padding: 1rem; }
+  .at-compteur-icone { width: 40px; height: 40px; border-radius: 10px; }
+  .at-compteur-icone svg { width: 20px; height: 20px; }
+  .at-compteur-valeur { font-size: 1.6rem; }
+  .at-compteur-libelle { font-size: .85rem; }
+}
 
 .at-camembert { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; }
 .at-camembert-graphique { width: 210px; max-width: 100%; }

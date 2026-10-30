@@ -69,14 +69,14 @@
       <tbody>
         {% for i in page %}
         <tr>
-          <td class="text-nowrap">{{ i.date|date:"d/m/Y" }}</td>
-          <td>
+          <td class="text-nowrap" data-label="Date">{{ i.date|date:"d/m/Y" }}</td>
+          <td data-label="Équipement">
             <a href="{% url 'equipements:detail' i.equipement.pk %}" class="fw-semibold text-decoration-none">{{ i.equipement.nom }}</a>
             <div class="small text-secondary">{{ i.equipement.emplacement }}</div>
           </td>
-          <td>{% include "interventions/_type.html" with intervention=i %}</td>
-          <td>{{ i.technicien }}</td>
-          <td class="small">{{ i.commentaire|truncatechars:70|default:"—" }}</td>
+          <td data-label="Type">{% include "interventions/_type.html" with intervention=i %}</td>
+          <td data-label="Technicien">{{ i.technicien }}</td>
+          <td class="small" data-label="Commentaire">{{ i.commentaire|truncatechars:70|default:"—" }}</td>
           <td class="text-end text-nowrap">
             <a href="{% url 'interventions:detail' i.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir"><i data-lucide="eye"></i></a>
             {% if i.modifiable %}

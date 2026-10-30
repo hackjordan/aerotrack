@@ -4,21 +4,23 @@
 {% block titre %}{{ equipement.nom }}{% endblock %}
 {% block titre_page %}{{ equipement.nom }}{% endblock %}
 
-{% block actions %}
-<a href="{% url 'equipements:liste' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
-  <i data-lucide="arrow-left"></i> Liste
-</a>
-{% if est_admin %}
-<a href="{% url 'equipements:modifier' equipement.pk %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
-  <i data-lucide="pencil"></i> Modifier
-</a>
-<a href="{% url 'equipements:supprimer' equipement.pk %}" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1">
-  <i data-lucide="trash-2"></i> Supprimer
-</a>
-{% endif %}
-{% endblock %}
-
 {% block contenu %}
+<div class="at-actions-page">
+  <a href="{% url 'equipements:liste' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+    <i data-lucide="arrow-left"></i> Liste
+  </a>
+  {% if est_admin %}
+  <div class="at-actions-page-droite">
+    <a href="{% url 'equipements:modifier' equipement.pk %}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="pencil"></i> Modifier
+    </a>
+    <a href="{% url 'equipements:supprimer' equipement.pk %}" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1">
+      <i data-lucide="trash-2"></i> Supprimer
+    </a>
+  </div>
+  {% endif %}
+</div>
+
 <div class="row g-3 mb-3">
   {# ---------- Informations (F2.6) ---------- #}
   <div class="col-lg-8">
@@ -91,10 +93,10 @@
       <tbody>
         {% for i in interventions %}
         <tr>
-          <td class="text-nowrap">{{ i.date|date:"d/m/Y" }}</td>
-          <td>{% include "interventions/_type.html" with intervention=i %}</td>
-          <td>{{ i.technicien }}</td>
-          <td class="small">{{ i.commentaire|truncatechars:80|default:"—" }}</td>
+          <td class="text-nowrap" data-label="Date">{{ i.date|date:"d/m/Y" }}</td>
+          <td data-label="Type">{% include "interventions/_type.html" with intervention=i %}</td>
+          <td data-label="Technicien">{{ i.technicien }}</td>
+          <td class="small" data-label="Commentaire">{{ i.commentaire|truncatechars:80|default:"—" }}</td>
           <td class="text-end"><a href="{% url 'interventions:detail' i.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir"><i data-lucide="eye"></i></a></td>
         </tr>
         {% empty %}
@@ -114,11 +116,11 @@
       <tbody>
         {% for h in historique %}
         <tr>
-          <td class="text-nowrap">{{ h.date|date:"d/m/Y H:i" }}</td>
-          <td>{{ h.ancien_statut|badge_statut }}</td>
-          <td>{{ h.nouveau_statut|badge_statut }}</td>
-          <td>{{ h.auteur.get_full_name|default:h.auteur.username|default:"—" }}</td>
-          <td>{{ h.commentaire|default:"—" }}</td>
+          <td class="text-nowrap" data-label="Date">{{ h.date|date:"d/m/Y H:i" }}</td>
+          <td data-label="Ancien statut">{{ h.ancien_statut|badge_statut }}</td>
+          <td data-label="Nouveau statut">{{ h.nouveau_statut|badge_statut }}</td>
+          <td data-label="Par">{% if h.auteur %}{{ h.auteur.get_full_name|default:h.auteur.username }}{% else %}—{% endif %}</td>
+          <td data-label="Commentaire">{{ h.commentaire|default:"—" }}</td>
         </tr>
         {% empty %}
         <tr><td colspan="5" class="text-center text-secondary py-3">Aucun changement de statut enregistré.</td></tr>

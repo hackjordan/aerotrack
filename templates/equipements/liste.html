@@ -77,10 +77,10 @@
         {% for e in page %}
         <tr>
           <td><a href="{% url 'equipements:detail' e.pk %}" class="fw-semibold text-decoration-none">{{ e.nom }}</a><div class="small text-secondary">{{ e.marque }}</div></td>
-          <td class="font-monospace small text-nowrap">{{ e.numero_serie }}</td>
-          <td>{{ e.type }}{% if e.type.categorie %}<div class="small text-secondary">{{ e.type.categorie }}</div>{% endif %}</td>
-          <td>{{ e.emplacement }}</td>
-          <td>{{ e.statut|badge_statut }}</td>
+          <td class="font-monospace small text-nowrap" data-label="N° de série">{{ e.numero_serie }}</td>
+          <td data-label="Type">{{ e.type }}{% if e.type.categorie %}<div class="small text-secondary">{{ e.type.categorie }}</div>{% endif %}</td>
+          <td data-label="Emplacement">{{ e.emplacement }}</td>
+          <td data-label="Statut">{{ e.statut|badge_statut }}</td>
           <td class="text-end"><a href="{% url 'equipements:detail' e.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir la fiche"><i data-lucide="eye"></i></a></td>
         </tr>
         {% empty %}

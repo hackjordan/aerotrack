@@ -133,6 +133,14 @@ class PagesEquipementsTests(TestCase):
                 self.assertContains(self.client.get(reverse("equipements:liste")), "Radar primaire")
                 self.assertContains(self.client.get(reverse("equipements:detail", args=[self.radar1.pk])), "RAD-001")
 
+    def test_fiche_avec_historique_sans_auteur(self):
+        # Changements créés par init_demo : aucun auteur, la fiche doit quand même s'afficher.
+        HistoriqueStatut.objects.create(
+            equipement=self.vhf1, ancien_statut=Statut.FONCTIONNEL, nouveau_statut=Statut.EN_PANNE,
+        )
+        self.client.force_login(self.tech)
+        self.assertContains(self.client.get(reverse("equipements:detail", args=[self.vhf1.pk])), "VHF-118")
+
     def test_utilisateur_sans_role_refuse(self):
         self.client.force_login(self.sans_role)
         self.assertEqual(self.client.get(reverse("equipements:liste")).status_code, 403)

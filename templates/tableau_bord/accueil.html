@@ -7,25 +7,25 @@
 {% block contenu %}
 {# ---------- F6.1 : compteurs (un clic ouvre la liste filtrée) ---------- #}
 <div class="row g-3 mb-3">
-  <div class="col-sm-6 col-xl-3">
+  <div class="col-6 col-xl-3">
     <a class="at-card at-compteur at-compteur-total" href="{% url 'equipements:liste' %}">
       <span class="at-compteur-icone"><i data-lucide="server"></i></span>
       <span><span class="at-compteur-valeur">{{ compteurs.total }}</span><span class="at-compteur-libelle">Équipements</span></span>
     </a>
   </div>
-  <div class="col-sm-6 col-xl-3">
+  <div class="col-6 col-xl-3">
     <a class="at-card at-compteur at-compteur-ok" href="{% url 'equipements:liste' %}?statut=FONCTIONNEL">
       <span class="at-compteur-icone"><i data-lucide="circle-check"></i></span>
       <span><span class="at-compteur-valeur">{{ compteurs.fonctionnels }}</span><span class="at-compteur-libelle">Fonctionnels</span></span>
     </a>
   </div>
-  <div class="col-sm-6 col-xl-3">
+  <div class="col-6 col-xl-3">
     <a class="at-card at-compteur at-compteur-panne" href="{% url 'equipements:liste' %}?statut=EN_PANNE">
       <span class="at-compteur-icone"><i data-lucide="triangle-alert"></i></span>
       <span><span class="at-compteur-valeur">{{ compteurs.en_panne }}</span><span class="at-compteur-libelle">En panne</span></span>
     </a>
   </div>
-  <div class="col-sm-6 col-xl-3">
+  <div class="col-6 col-xl-3">
     <a class="at-card at-compteur at-compteur-maint" href="{% url 'equipements:liste' %}?statut=EN_MAINTENANCE">
       <span class="at-compteur-icone"><i data-lucide="wrench"></i></span>
       <span><span class="at-compteur-valeur">{{ compteurs.en_maintenance }}</span><span class="at-compteur-libelle">En maintenance</span></span>
@@ -102,11 +102,11 @@
       <tbody>
         {% for i in dernieres_interventions %}
         <tr>
-          <td class="text-nowrap"><a href="{% url 'interventions:detail' i.pk %}" class="text-decoration-none">{{ i.date|date:"d/m/Y" }}</a></td>
-          <td><a href="{% url 'equipements:detail' i.equipement.pk %}" class="fw-semibold text-decoration-none">{{ i.equipement.nom }}</a></td>
-          <td>{% include "interventions/_type.html" with intervention=i %}</td>
-          <td>{{ i.technicien }}</td>
-          <td>{{ i.equipement.statut|badge_statut }}</td>
+          <td class="text-nowrap" data-label="Date"><a href="{% url 'interventions:detail' i.pk %}" class="text-decoration-none">{{ i.date|date:"d/m/Y" }}</a></td>
+          <td data-label="Équipement"><a href="{% url 'equipements:detail' i.equipement.pk %}" class="fw-semibold text-decoration-none">{{ i.equipement.nom }}</a></td>
+          <td data-label="Type">{% include "interventions/_type.html" with intervention=i %}</td>
+          <td data-label="Technicien">{{ i.technicien }}</td>
+          <td data-label="Statut actuel">{{ i.equipement.statut|badge_statut }}</td>
         </tr>
         {% empty %}
         <tr><td colspan="5" class="text-center text-secondary py-4">Aucune intervention enregistrée pour le moment.</td></tr>
