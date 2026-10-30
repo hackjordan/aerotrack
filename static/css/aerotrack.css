@@ -208,16 +208,99 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
 .at-simple-marque .at-nom-track { color: #0678b0; }
 .at-simple-sous-titre { text-align: center; color: var(--at-texte-2); font-size: .85rem; margin-bottom: 1.5rem; }
 
-/* Connexion : photo de la tour de Douala sous un voile transparent aux couleurs du logo */
+/* ---------- Connexion : carte en deux panneaux aux couleurs de l'interface ---------- */
+/* Fond gris clair de l'application, deux halos discrets aux couleurs du logo */
 .at-connexion {
   background:
-    linear-gradient(110deg, rgba(10, 168, 230, .35) 0%, rgba(10, 42, 128, .85) 100%),
-    url("../img/tour-douala.jpg") center top / cover no-repeat;
+    radial-gradient(circle at 0% 0%, rgba(10, 168, 230, .16), transparent 42%),
+    radial-gradient(circle at 100% 100%, rgba(10, 42, 128, .14), transparent 42%),
+    var(--at-fond);
+}
+.at-connexion-carte {
+  display: grid; grid-template-columns: 1fr 1.1fr;
+  width: 100%; max-width: 900px; min-height: 540px;
+  background: var(--at-carte); border-radius: 18px; overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(10, 47, 92, .06),
+    0 12px 28px rgba(10, 47, 92, .12),
+    0 36px 72px -24px rgba(10, 47, 92, .3);
+}
+
+/* Panneau gauche : bleu de la barre latérale, halo bleu ciel du logo */
+.at-connexion-marque {
+  display: flex; flex-direction: column;
+  padding: 2.5rem; color: #fff;
+  background:
+    radial-gradient(circle at 90% 8%, rgba(10, 168, 230, .35), transparent 45%),
+    linear-gradient(160deg, var(--at-sidebar-fond) 0%, var(--at-logo-marine) 100%);
+}
+.at-connexion-logo {
+  width: 72px; height: 72px; flex-shrink: 0; border-radius: 50%; background: #fff; object-fit: cover;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, .15);
+}
+.at-connexion-nom { margin-top: 1.25rem; font-size: 2rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+.at-connexion-nom .at-nom-aero { color: var(--at-logo-or); }
+.at-connexion-nom .at-nom-track { color: var(--at-logo-ciel); }
+.at-connexion-slogan { margin: .6rem 0 0; max-width: 22rem; font-size: .95rem; color: rgba(255, 255, 255, .8); }
+.at-connexion-points { list-style: none; padding: 0; margin: 2.25rem 0 0; display: grid; gap: .9rem; }
+.at-connexion-points li { display: flex; align-items: center; gap: .75rem; font-size: .9rem; color: rgba(255, 255, 255, .92); }
+.at-connexion-puce {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 34px; height: 34px; border-radius: 9px; background: rgba(255, 255, 255, .1);
+}
+.at-connexion-puce svg { width: 17px; height: 17px; color: var(--at-logo-ciel); }
+.at-connexion-pied { margin: auto 0 0; padding-top: 2rem; font-size: .8rem; color: rgba(255, 255, 255, .6); }
+
+/* Panneau droit : formulaire */
+.at-connexion-form { display: flex; flex-direction: column; justify-content: center; padding: 2.75rem 2.5rem; }
+.at-connexion-form h1 { margin: 0; font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
+.at-connexion-intro { margin: .35rem 0 1.75rem; color: var(--at-texte-2); }
+.at-connexion-form .form-label { font-size: .875rem; font-weight: 500; }
+.at-connexion-erreur { display: flex; align-items: center; gap: .5rem; padding: .6rem .85rem; border-radius: 10px; font-size: .9rem; }
+.at-connexion-erreur svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* Champ avec icône à gauche (et bouton « œil » à droite pour le mot de passe) */
+.at-champ-icone { position: relative; }
+.at-champ-icone > svg {
+  position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; color: var(--at-texte-2); pointer-events: none;
+}
+.at-champ-icone .form-control { padding: .7rem .9rem .7rem 2.6rem; border-radius: 10px; }
+.at-champ-icone .form-control:focus { border-color: var(--at-logo-ciel); box-shadow: 0 0 0 .2rem rgba(10, 168, 230, .2); }
+.at-champ-icone .form-control.is-invalid { background-image: none; }
+.at-champ-mdp .form-control { padding-right: 2.9rem; }
+.at-voir-mdp {
+  position: absolute; right: .4rem; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border: 0; border-radius: 8px; background: none; color: var(--at-texte-2);
+}
+.at-voir-mdp:hover { background: var(--at-fond); color: var(--at-bleu); }
+.at-voir-mdp svg { width: 18px; height: 18px; }
+.at-voir-mdp .at-oeil-barre, .at-voir-mdp.visible .at-oeil { display: none; }
+.at-voir-mdp.visible .at-oeil-barre { display: inline; }
+
+.at-btn-connexion {
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  padding: .75rem; border-radius: 10px; font-weight: 600;
+  box-shadow: 0 6px 16px rgba(11, 79, 138, .25);
+}
+.at-btn-connexion svg { width: 18px; height: 18px; }
+.at-connexion-aide { display: flex; align-items: flex-start; gap: .5rem; margin: 1.5rem 0 0; font-size: .82rem; color: var(--at-texte-2); }
+.at-connexion-aide svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: .1rem; }
+
+/* Téléphone : panneaux empilés, le panneau bleu devient un bandeau compact */
+@media (max-width: 767.98px) {
+  .at-connexion-carte { grid-template-columns: 1fr; min-height: 0; }
+  .at-connexion-marque { flex-direction: row; align-items: center; gap: .9rem; padding: 1.25rem 1.5rem; }
+  .at-connexion-logo { width: 48px; height: 48px; }
+  .at-connexion-nom { margin-top: 0; font-size: 1.5rem; }
+  .at-connexion-slogan, .at-connexion-points, .at-connexion-pied { display: none; }
+  .at-connexion-form { padding: 1.75rem 1.5rem; }
 }
 
 /* ---------- Formulaires et tableaux ---------- */
 /* Bootstrap colore les champs avec le fond de page (gris) : on les garde blancs. */
-.form-control, .form-select { background-color: var(--at-carte); }
+.form-control, .form-control:focus, .form-select { background-color: var(--at-carte); }
 .form-control:disabled, .form-select:disabled { background-color: var(--at-fond); }
 /* Formulaires centrés horizontalement dans la page */
 .at-form-carte { max-width: 640px; margin-left: auto; margin-right: auto; }

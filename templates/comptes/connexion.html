@@ -1,19 +1,83 @@
 {% extends "base_simple.html" %}
+{% load static %}
 
 {% block titre %}Connexion{% endblock %}
 {% block classe_page %}at-connexion{% endblock %}
 
-{% block contenu %}
-<h1 class="h5 mb-3">Connexion</h1>
+{% block page %}
+<main class="at-connexion-carte">
+  {# Panneau gauche : identité de l'application, aux couleurs de la barre latérale #}
+  <section class="at-connexion-marque">
+    <img src="{% static 'img/logo-asecna.jpg' %}" alt="Logo ASECNA" class="at-connexion-logo">
+    <div class="at-connexion-nom"><span class="at-nom-aero">Aéro</span><span class="at-nom-track">Track</span></div>
+    <p class="at-connexion-slogan">Gestion des équipements techniques de la tour de contrôle de Douala.</p>
+    <ul class="at-connexion-points">
+      <li><span class="at-connexion-puce"><i data-lucide="server"></i></span> Inventaire et localisation des équipements</li>
+      <li><span class="at-connexion-puce"><i data-lucide="wrench"></i></span> Suivi des interventions de maintenance</li>
+      <li><span class="at-connexion-puce"><i data-lucide="layout-dashboard"></i></span> État du parc en un coup d'œil</li>
+    </ul>
+    <p class="at-connexion-pied">ASECNA · Unité RSI · Aéroport de Douala</p>
+  </section>
 
-<form method="post" novalidate>
-  {% csrf_token %}
-  {% include "includes/formulaire.html" %}
-  <input type="hidden" name="next" value="{{ next }}">
-  <button type="submit" class="btn btn-primary w-100">Se connecter</button>
-</form>
+  {# Panneau droit : formulaire de connexion #}
+  <section class="at-connexion-form">
+    <h1>Connexion</h1>
+    <p class="at-connexion-intro">Accédez à votre espace de gestion du parc.</p>
 
-<p class="text-secondary small mt-3 mb-0">
-  Mot de passe oublié ? Contactez l'administrateur de l'Unité RSI.
-</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger at-connexion-erreur">
+        <i data-lucide="circle-alert"></i>
+        <span>{% for erreur in form.non_field_errors %}{{ erreur }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</span>
+      </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+        <div class="at-champ-icone">
+          <i data-lucide="user"></i>
+          {{ form.username }}
+        </div>
+        {% for erreur in form.username.errors %}<div class="invalid-feedback d-block">{{ erreur }}</div>{% endfor %}
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+        <div class="at-champ-icone at-champ-mdp">
+          <i data-lucide="lock"></i>
+          {{ form.password }}
+          <button type="button" class="at-voir-mdp" data-voir-mdp="{{ form.password.id_for_label }}" aria-label="Afficher le mot de passe">
+            <i data-lucide="eye" class="at-oeil"></i><i data-lucide="eye-off" class="at-oeil-barre"></i>
+          </button>
+        </div>
+        {% for erreur in form.password.errors %}<div class="invalid-feedback d-block">{{ erreur }}</div>{% endfor %}
+      </div>
+
+      <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit" class="btn btn-primary w-100 at-btn-connexion">
+        <i data-lucide="log-in"></i> Se connecter
+      </button>
+    </form>
+
+    <p class="at-connexion-aide">
+      <i data-lucide="info"></i> Mot de passe oublié ? Contactez l'administrateur de l'Unité RSI.
+    </p>
+  </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  /* Bouton « œil » : affiche ou masque le mot de passe saisi. */
+  document.querySelectorAll("[data-voir-mdp]").forEach(function (bouton) {
+    var champ = document.getElementById(bouton.dataset.voirMdp);
+    bouton.addEventListener("click", function () {
+      var afficher = champ.type === "password";
+      champ.type = afficher ? "text" : "password";
+      bouton.classList.toggle("visible", afficher);
+      bouton.setAttribute("aria-label", afficher ? "Masquer le mot de passe" : "Afficher le mot de passe");
+    });
+  });
+</script>
 {% endblock %}

@@ -20,6 +20,11 @@ class ConnexionForm(BootstrapMixin, AuthenticationForm):
         "inactive": "Ce compte est désactivé. Contactez l'administrateur.",
     }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs["placeholder"] = "Votre identifiant"
+        self.fields["password"].widget.attrs["placeholder"] = "Votre mot de passe"
+
 
 class ChangementMotDePasseForm(BootstrapMixin, PasswordChangeForm):
     pass

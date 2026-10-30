@@ -10,14 +10,17 @@
 </head>
 <body class="at-simple {% block classe_page %}{% endblock %}">
   {# Gabarit sans barre latérale : page de connexion et pages d'erreur. #}
+  {% block page %}
   <main class="at-simple-carte">
     <img src="{% static 'img/logo-asecna.jpg' %}" alt="Logo ASECNA" class="at-simple-logo">
     <div class="at-simple-marque"><span class="at-nom-aero">Aéro</span><span class="at-nom-track">Track</span></div>
     <p class="at-simple-sous-titre">ASECNA · Tour de contrôle de Douala</p>
     {% block contenu %}{% endblock %}
   </main>
+  {% endblock %}
   <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'vendor/lucide/lucide.min.js' %}"></script>
   <script>lucide.createIcons();</script>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>
