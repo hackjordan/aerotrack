@@ -10,25 +10,25 @@
   <div class="col-6 col-xl-3">
     <a class="at-card at-compteur at-compteur-total" href="{% url 'equipements:liste' %}">
       <span class="at-compteur-icone"><i data-lucide="server"></i></span>
-      <span><span class="at-compteur-valeur">{{ compteurs.total }}</span><span class="at-compteur-libelle">Équipements</span></span>
+      <span><span class="at-compteur-valeur" data-compteur>{{ compteurs.total }}</span><span class="at-compteur-libelle">Équipements</span></span>
     </a>
   </div>
   <div class="col-6 col-xl-3">
     <a class="at-card at-compteur at-compteur-ok" href="{% url 'equipements:liste' %}?statut=FONCTIONNEL">
       <span class="at-compteur-icone"><i data-lucide="circle-check"></i></span>
-      <span><span class="at-compteur-valeur">{{ compteurs.fonctionnels }}</span><span class="at-compteur-libelle">Fonctionnels</span></span>
+      <span><span class="at-compteur-valeur" data-compteur>{{ compteurs.fonctionnels }}</span><span class="at-compteur-libelle">Fonctionnels</span></span>
     </a>
   </div>
   <div class="col-6 col-xl-3">
     <a class="at-card at-compteur at-compteur-panne" href="{% url 'equipements:liste' %}?statut=EN_PANNE">
       <span class="at-compteur-icone"><i data-lucide="triangle-alert"></i></span>
-      <span><span class="at-compteur-valeur">{{ compteurs.en_panne }}</span><span class="at-compteur-libelle">En panne</span></span>
+      <span><span class="at-compteur-valeur" data-compteur>{{ compteurs.en_panne }}</span><span class="at-compteur-libelle">En panne</span></span>
     </a>
   </div>
   <div class="col-6 col-xl-3">
     <a class="at-card at-compteur at-compteur-maint" href="{% url 'equipements:liste' %}?statut=EN_MAINTENANCE">
       <span class="at-compteur-icone"><i data-lucide="wrench"></i></span>
-      <span><span class="at-compteur-valeur">{{ compteurs.en_maintenance }}</span><span class="at-compteur-libelle">En maintenance</span></span>
+      <span><span class="at-compteur-valeur" data-compteur>{{ compteurs.en_maintenance }}</span><span class="at-compteur-libelle">En maintenance</span></span>
     </a>
   </div>
 </div>

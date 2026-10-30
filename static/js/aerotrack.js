@@ -51,6 +51,24 @@
   petitEcran.addEventListener("change", fermerMobile);
 })();
 
+/* Compteurs (data-compteur) : le chiffre défile de 0 à sa valeur au chargement. */
+(function () {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll("[data-compteur]").forEach(function (el) {
+    var cible = parseInt(el.textContent, 10);
+    if (!cible) return;
+    var debut = null, duree = 900;
+    el.textContent = "0";
+    function etape(t) {
+      if (debut === null) debut = t;
+      var p = Math.min((t - debut) / duree, 1);
+      el.textContent = Math.round(cible * (1 - Math.pow(1 - p, 3)));  // ralentit en fin de course
+      if (p < 1) requestAnimationFrame(etape);
+    }
+    requestAnimationFrame(etape);
+  });
+})();
+
 /* Filtres des listes : appliqués dès qu'une valeur est choisie (pas de bouton « Filtrer »). */
 document.querySelectorAll("[data-auto-submit]").forEach(function (champ) {
   champ.addEventListener("change", function () {

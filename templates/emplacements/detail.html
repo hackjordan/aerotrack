@@ -27,7 +27,7 @@
     <a class="at-card at-stat at-stat-lien h-100 {% if code == 'FONCTIONNEL' %}at-stat-ok{% elif code == 'EN_PANNE' %}at-stat-panne{% else %}at-stat-maint{% endif %}"
        href="{% url 'equipements:liste' %}?emplacement={{ emplacement.pk }}&amp;statut={{ code }}">
       <span class="at-stat-label">{{ libelle }}</span>
-      <span class="at-stat-value">{{ nombre }}</span>
+      <span class="at-stat-value" data-compteur>{{ nombre }}</span>
     </a>
   </div>
   {% endfor %}
