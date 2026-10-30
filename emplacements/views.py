@@ -5,6 +5,7 @@ from django.db.models import Count, ProtectedError, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from aerotrack.filtres import trier
 from comptes.roles import ADMINISTRATEUR, TECHNICIEN, role_requis
 from equipements.models import Statut
 
@@ -12,6 +13,14 @@ from .forms import EmplacementForm
 from .models import Emplacement
 
 TOUS_LES_ROLES = (ADMINISTRATEUR, TECHNICIEN)
+
+# Colonnes triables de la liste : clé de l'URL → champs du tri
+COLONNES_TRI = {
+    "batiment": ["batiment", "zone"],
+    "zone": ["zone", "batiment"],
+    "equipements": ["nb_equipements"],
+    "pannes": ["nb_pannes"],
+}
 
 
 @role_requis(*TOUS_LES_ROLES)
@@ -23,9 +32,11 @@ def liste(request):
         nb_pannes=Count("equipements", filter=Q(equipements__statut=Statut.EN_PANNE)),
     ).order_by("batiment", "zone")  # annotate() ignore Meta.ordering
     if recherche:
-        emplacements = emplacements.filter(Q(batiment__icontains=recherche) | Q(zone__icontains=recherche))
+        emplacements = emplacements.recherche(recherche)
+    emplacements, tri = trier(request, emplacements, COLONNES_TRI)
     return render(request, "emplacements/liste.html", {
         "page": Paginator(emplacements, 30).get_page(request.GET.get("page")),
+        "tri": tri,
         "recherche": recherche,
     })
 

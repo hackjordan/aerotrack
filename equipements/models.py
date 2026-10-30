@@ -9,6 +9,7 @@ Règles de gestion appliquées ici :
 """
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.db.models.functions import Upper
 
 from emplacements.models import Emplacement
@@ -19,6 +20,12 @@ class Statut(models.TextChoices):
     FONCTIONNEL = "FONCTIONNEL", "Fonctionnel"
     EN_PANNE = "EN_PANNE", "En panne"
     EN_MAINTENANCE = "EN_MAINTENANCE", "En maintenance"
+
+
+class EquipementQuerySet(models.QuerySet):
+    def recherche(self, texte):
+        """Recherche par nom, n° de série ou marque (liste F2.5 et recherche globale)."""
+        return self.filter(Q(nom__icontains=texte) | Q(numero_serie__icontains=texte) | Q(marque__icontains=texte))
 
 
 class Equipement(models.Model):
@@ -44,6 +51,8 @@ class Equipement(models.Model):
 
     cree_le = models.DateTimeField("créé le", auto_now_add=True)
     modifie_le = models.DateTimeField("modifié le", auto_now=True)
+
+    objects = EquipementQuerySet.as_manager()
 
     class Meta:
         verbose_name = "équipement"

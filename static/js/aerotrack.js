@@ -5,6 +5,7 @@
   var layout = document.getElementById("at-layout");
   var bouton = document.getElementById("at-menu-btn");
   var voile = document.getElementById("at-overlay");
+  if (!layout || !bouton) return;  // pages sans barre latérale (connexion, erreurs)
   var petitEcran = window.matchMedia("(max-width: 991.98px)");
   var CLE = "aerotrack.sidebarRepliee";
 
@@ -75,6 +76,45 @@
     setTimeout(function () { racine.classList.remove("at-bascule-theme"); }, 400);
   });
 })();
+
+/* Recherche globale : Ctrl+K (ou « / » hors d'un champ) place le curseur dans la barre du haut. */
+(function () {
+  var champ = document.getElementById("at-recherche-globale");
+  if (!champ) return;
+  document.addEventListener("keydown", function (e) {
+    var dansUnChamp = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+    var raccourci = ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") || (e.key === "/" && !dansUnChamp);
+    if (!raccourci || champ.offsetParent === null) return;  // champ masqué sur téléphone
+    e.preventDefault();
+    champ.focus();
+    champ.select();
+  });
+})();
+
+/* Formulaires d'enregistrement (POST) : le bouton affiche un indicateur et se bloque
+   pendant l'envoi. Évite le double clic, donc les doublons. */
+document.addEventListener("submit", function (e) {
+  var form = e.target;
+  if (e.defaultPrevented || form.method.toLowerCase() !== "post") return;
+  var bouton = e.submitter || form.querySelector("[type=submit]");
+  if (!bouton || bouton.classList.contains("at-envoi")) return;
+  // Bloqué juste après l'envoi : un bouton désactivé avant ne serait pas transmis
+  setTimeout(function () {
+    bouton.classList.add("at-envoi");
+    bouton.disabled = true;
+    bouton.insertAdjacentHTML("afterbegin", '<span class="spinner-border" aria-hidden="true"></span>');
+  }, 0);
+});
+/* Retour arrière du navigateur : la page revient de son cache avec ses boutons bloqués. */
+window.addEventListener("pageshow", function (e) {
+  if (!e.persisted) return;
+  document.querySelectorAll(".at-envoi").forEach(function (bouton) {
+    bouton.classList.remove("at-envoi");
+    bouton.disabled = false;
+    var indicateur = bouton.querySelector(".spinner-border");
+    if (indicateur) indicateur.remove();
+  });
+});
 
 /* Compteurs (data-compteur) : le chiffre défile de 0 à sa valeur au chargement. */
 (function () {

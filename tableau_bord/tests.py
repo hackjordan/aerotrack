@@ -1,6 +1,7 @@
-"""Tests du module 6 : tableau de bord (F6.1, F6.2, F6.4)."""
-from datetime import timedelta
+"""Tests du module 6 : tableau de bord (F6.1, F6.2, F6.4) et recherche globale."""
+from datetime import datetime, timedelta
 from io import StringIO
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
@@ -9,9 +10,12 @@ from django.urls import reverse
 from django.utils import timezone
 
 from comptes.roles import ADMINISTRATEUR, TECHNICIEN, definir_role
+from emplacements.models import Emplacement
 from equipements.models import Equipement, Statut
 from interventions.models import Intervention
-from referentiels.models import Technicien, TypeIntervention
+from referentiels.models import Technicien, TypeEquipement, TypeIntervention
+
+from .templatetags.interface import surligner
 
 
 class TableauDeBordTests(TestCase):
@@ -81,3 +85,60 @@ class TableauDeBordTests(TestCase):
         reponse = self.client.get("/")
         self.assertEqual(reponse.context["compteurs"]["total"], 0)
         self.assertContains(reponse, "Aucun équipement enregistré")
+
+    def test_message_d_accueil(self):
+        # Sans prénom renseigné, l'identifiant est repris avec une majuscule
+        self.assertContains(self.client.get("/"), '<span class="at-accueil-nom">Tech</span>')
+        for heure, attendu in ((9, "Bonjour"), (18, "Bonsoir")):
+            with self.subTest(heure=heure), patch("tableau_bord.views.timezone") as horloge:
+                horloge.localtime.return_value = datetime(2026, 10, 30, heure, 0)
+                self.assertEqual(self.client.get("/").context["salutation"], attendu)
+
+
+class RechercheGlobaleTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        User = get_user_model()
+        cls.tech = User.objects.create_user("tech", password="x")
+        definir_role(cls.tech, TECHNICIEN)
+        cls.sans_role = User.objects.create_user("sansrole", password="x")
+
+        type_radar = TypeEquipement.objects.create(libelle="Radar")
+        vigie = Emplacement.objects.create(zone="Vigie", batiment="Tour de contrôle")
+        cls.radar = Equipement.objects.create(
+            nom="Radar primaire", numero_serie="RAD-001", marque="Thales", type=type_radar, emplacement=vigie,
+        )
+        Intervention.objects.create(
+            equipement=cls.radar, technicien=Technicien.objects.create(nom="Ngono", prenom="Paul", unite="IRE"),
+            type=TypeIntervention.objects.create(libelle="Préventive"), commentaire="Contrôle de la vigie",
+        )
+
+    def setUp(self):
+        self.client.force_login(self.tech)
+
+    def rechercher(self, texte):
+        return self.client.get(reverse("tableau_bord:recherche"), {"q": texte})
+
+    def test_cherche_dans_les_trois_rubriques(self):
+        contexte = self.rechercher("vigie").context  # zone de l'emplacement, commentaire de l'intervention
+        self.assertEqual((contexte["nb_equipements"], contexte["nb_emplacements"], contexte["nb_interventions"]), (0, 1, 1))
+        contexte = self.rechercher("rad-001").context  # n° de série, sans tenir compte des majuscules
+        self.assertEqual(list(contexte["equipements"]), [self.radar])
+        self.assertEqual(contexte["nb_total"], 2)  # l'équipement et son intervention
+
+    def test_mot_trouve_surligne(self):
+        self.assertContains(self.rechercher("radar"), '<mark class="at-surligne">Radar</mark> primaire')
+
+    def test_surlignage_sans_injection_html(self):
+        self.assertEqual(surligner("<i>Radar</i>", "radar"), '&lt;i&gt;<mark class="at-surligne">Radar</mark>&lt;/i&gt;')
+
+    def test_recherche_vide_ou_sans_resultat(self):
+        self.assertContains(self.rechercher("  "), "Que cherchez-vous")
+        self.assertContains(self.rechercher("introuvable"), "Aucun résultat")
+
+    def test_champ_dans_la_barre_du_haut(self):
+        self.assertContains(self.client.get("/"), 'id="at-recherche-globale"')
+
+    def test_utilisateur_sans_role_refuse(self):
+        self.client.force_login(self.sans_role)
+        self.assertEqual(self.rechercher("radar").status_code, 403)

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load interface %}
 
 {% block titre %}Emplacements{% endblock %}
 {% block titre_page %}Emplacements{% endblock %}
@@ -15,6 +16,7 @@
   </div>
 
   <form method="get" class="at-filtres-barre mb-3" role="search">
+    {% if tri %}<input type="hidden" name="tri" value="{{ tri }}">{% endif %}
     <div class="at-recherche">
       <i data-lucide="search"></i>
       <input type="search" name="q" value="{{ recherche }}" class="form-control" placeholder="Rechercher un bâtiment ou une zone" aria-label="Rechercher">
@@ -25,7 +27,13 @@
   <div class="table-responsive">
     <table class="table table-hover align-middle at-table">
       <thead>
-        <tr><th>Bâtiment</th><th>Zone</th><th>Équipements</th><th>En panne</th><th class="text-end"></th></tr>
+        <tr>
+          {% entete_tri "Bâtiment" "batiment" %}
+          {% entete_tri "Zone" "zone" %}
+          {% entete_tri "Équipements" "equipements" %}
+          {% entete_tri "En panne" "pannes" %}
+          <th class="text-end"></th>
+        </tr>
       </thead>
       <tbody>
         {% for e in page %}
@@ -43,7 +51,15 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="text-center text-secondary py-4">Aucun emplacement trouvé.</td></tr>
+        <tr class="at-ligne-vide"><td colspan="5">
+          {% if recherche %}
+            {% url 'emplacements:liste' as url_liste %}
+            {% include "includes/etat_vide.html" with icone="search-x" titre="Aucun emplacement trouvé" texte="Essayez avec un autre nom de bâtiment ou de zone." lien=url_liste libelle_lien="Effacer la recherche" icone_lien="x" classe_lien="btn-outline-secondary" %}
+          {% else %}
+            {% if est_admin %}{% url 'emplacements:ajouter' as url_ajout %}{% endif %}
+            {% include "includes/etat_vide.html" with icone="map-pin" titre="Aucun emplacement enregistré pour le moment" texte="Les bâtiments et zones où se trouvent les équipements apparaîtront ici." lien=url_ajout libelle_lien="Ajouter un emplacement" %}
+          {% endif %}
+        </td></tr>
         {% endfor %}
       </tbody>
     </table>

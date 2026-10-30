@@ -1,0 +1,7 @@
+{# En-tête de colonne triable (balise entete_tri). Contexte : libelle, url, sens. #}
+<th{% if sens %} aria-sort="{% if sens == 'croissant' %}ascending{% else %}descending{% endif %}"{% endif %}>
+  <a href="{{ url }}" class="at-tri{% if sens %} actif{% endif %}" title="Trier par {{ libelle|lower }}">
+    {{ libelle }}
+    {% if sens == "croissant" %}<i data-lucide="arrow-up"></i>{% elif sens == "decroissant" %}<i data-lucide="arrow-down"></i>{% else %}<i data-lucide="chevrons-up-down"></i>{% endif %}
+  </a>
+</th>

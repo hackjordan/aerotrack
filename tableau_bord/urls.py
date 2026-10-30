@@ -6,4 +6,5 @@ app_name = "tableau_bord"
 
 urlpatterns = [
     path("", views.accueil, name="accueil"),
+    path("recherche/", views.recherche, name="recherche"),
 ]

@@ -1,7 +1,10 @@
-"""Module 6 : tableau de bord (F6.1, F6.2, F6.4)."""
+"""Module 6 : tableau de bord (F6.1, F6.2, F6.4), et recherche globale de la barre du haut."""
 from django.db.models import Count, F, Max, Q
 from django.shortcuts import render
+from django.utils import timezone
 
+from comptes.roles import ADMINISTRATEUR, TECHNICIEN, role_requis
+from emplacements.models import Emplacement
 from equipements.models import Equipement, Statut
 from interventions.models import Intervention
 from referentiels.models import Categorie
@@ -9,6 +12,9 @@ from referentiels.models import Categorie
 # Palette catégorielle validée (ordre fixe : la couleur suit la catégorie, jamais son rang).
 COULEURS_CATEGORIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"]
 COULEUR_NON_CLASSE = "#9aa5b1"
+
+# Recherche globale : résultats affichés par rubrique (« Voir tout » ouvre la liste filtrée)
+RESULTATS_PAR_RUBRIQUE = 5
 
 
 def accueil(request):
@@ -52,6 +58,8 @@ def accueil(request):
     )
 
     return render(request, "tableau_bord/accueil.html", {
+        # Message d'accueil : « Bonsoir » à partir de 18 h (heure de Douala)
+        "salutation": "Bonsoir" if timezone.localtime().hour >= 18 else "Bonjour",
         "compteurs": compteurs,
         "repartition": repartition,
         "graphique": {
@@ -61,4 +69,33 @@ def accueil(request):
         },
         "dernieres_interventions": dernieres_interventions,
         "en_panne": en_panne,
+    })
+
+
+@role_requis(ADMINISTRATEUR, TECHNICIEN)
+def recherche(request):
+    """Recherche globale (barre du haut) : équipements, emplacements et interventions."""
+    texte = request.GET.get("q", "").strip()
+    if not texte:
+        return render(request, "tableau_bord/recherche.html", {"texte": ""})
+
+    equipements = Equipement.objects.recherche(texte).select_related("type", "emplacement")
+    emplacements = (
+        Emplacement.objects.recherche(texte)
+        .annotate(nb_equipements=Count("equipements"))
+        .order_by("batiment", "zone")  # annotate() ignore Meta.ordering
+    )
+    interventions = Intervention.objects.recherche(texte).select_related("equipement", "type")
+    nombres = {
+        "nb_equipements": equipements.count(),
+        "nb_emplacements": emplacements.count(),
+        "nb_interventions": interventions.count(),
+    }
+    return render(request, "tableau_bord/recherche.html", {
+        "texte": texte,
+        "equipements": equipements[:RESULTATS_PAR_RUBRIQUE],
+        "emplacements": emplacements[:RESULTATS_PAR_RUBRIQUE],
+        "interventions": interventions[:RESULTATS_PAR_RUBRIQUE],
+        "nb_total": sum(nombres.values()),
+        **nombres,
     })

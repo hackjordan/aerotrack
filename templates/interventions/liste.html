@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load interface %}
 
 {% block titre %}Interventions{% endblock %}
 {% block titre_page %}Interventions{% endblock %}
@@ -58,10 +59,10 @@
     <table class="table table-hover align-middle at-table">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Équipement</th>
-          <th>Type</th>
-          <th>Technicien</th>
+          {% entete_tri "Date" "date" %}
+          {% entete_tri "Équipement" "equipement" %}
+          {% entete_tri "Type" "type" %}
+          {% entete_tri "Technicien" "technicien" %}
           <th>Commentaire</th>
           <th class="text-end"></th>
         </tr>
@@ -85,8 +86,13 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="6" class="text-center text-secondary py-4">
-          {% if filtre_actif %}Aucune intervention ne correspond à ces critères.{% else %}Aucune intervention enregistrée pour le moment.{% endif %}
+        <tr class="at-ligne-vide"><td colspan="6">
+          {% if filtre_actif %}
+            {% include "includes/etat_vide.html" with icone="search-x" titre="Aucune intervention ne correspond à ces critères" texte="Modifiez la recherche, la période ou retirez un filtre." lien=url_reinitialiser libelle_lien="Effacer la recherche et les filtres" icone_lien="x" classe_lien="btn-outline-secondary" %}
+          {% else %}
+            {% if peut_saisir %}{% url 'interventions:ajouter' as url_ajout %}{% endif %}
+            {% include "includes/etat_vide.html" with icone="wrench" titre="Aucune intervention enregistrée pour le moment" texte="Les interventions de maintenance saisies apparaîtront ici." lien=url_ajout libelle_lien="Saisir une intervention" %}
+          {% endif %}
         </td></tr>
         {% endfor %}
       </tbody>

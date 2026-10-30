@@ -5,6 +5,13 @@
 {% block titre_page %}Tableau de bord{% endblock %}
 
 {% block contenu %}
+{# ---------- Message d'accueil : salutation et date du jour ---------- #}
+{% now "l j F Y" as aujourdhui %}
+<div class="at-accueil">
+  <h2 class="at-accueil-titre">{{ salutation }} <span class="at-accueil-nom">{{ user.first_name|default:user.username|capfirst }}</span></h2>
+  <p class="at-accueil-date"><i data-lucide="calendar-days"></i> {{ aujourdhui|capfirst }} · Voici l'état du parc aujourd'hui.</p>
+</div>
+
 {# ---------- F6.1 : compteurs (un clic ouvre la liste filtrée) ---------- #}
 <div class="row g-3 mb-3">
   <div class="col-6 col-xl-3">
@@ -57,7 +64,8 @@
         </ul>
       </div>
       {% else %}
-      <p class="text-secondary mb-0">Aucun équipement enregistré pour le moment.</p>
+      {% if est_admin %}{% url 'equipements:ajouter' as url_ajout %}{% endif %}
+      {% include "includes/etat_vide.html" with icone="chart-pie" titre="Aucun équipement enregistré pour le moment" texte="La répartition par catégorie s'affichera dès le premier équipement." lien=url_ajout libelle_lien="Ajouter un équipement" compact=True %}
       {% endif %}
     </div>
   </div>
@@ -109,7 +117,9 @@
           <td data-label="Statut actuel">{{ i.equipement.statut|badge_statut }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="text-center text-secondary py-4">Aucune intervention enregistrée pour le moment.</td></tr>
+        <tr class="at-ligne-vide"><td colspan="5">
+          {% include "includes/etat_vide.html" with icone="wrench" titre="Aucune intervention enregistrée pour le moment" texte="Les 5 dernières interventions saisies s'afficheront ici." compact=True %}
+        </td></tr>
         {% endfor %}
       </tbody>
     </table>

@@ -5,10 +5,9 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from aerotrack.filtres import puce
+from aerotrack.filtres import puce, trier
 from comptes.roles import ADMINISTRATEUR, TECHNICIEN, a_un_role, role_requis
 from equipements.models import Equipement
 from referentiels.models import Technicien, TypeIntervention
@@ -18,6 +17,14 @@ from .models import Intervention
 from .services import appliquer_statut
 
 TOUS_LES_ROLES = (ADMINISTRATEUR, TECHNICIEN)
+
+# Colonnes triables de la liste : clé de l'URL → champs du tri
+COLONNES_TRI = {
+    "date": ["date", "cree_le"],
+    "equipement": ["equipement__nom"],
+    "type": ["type__libelle"],
+    "technicien": ["technicien__nom", "technicien__prenom"],
+}
 
 
 def technicien_du_compte(user):
@@ -63,11 +70,7 @@ def liste(request):
     puces = []
 
     if filtres["q"]:
-        interventions = interventions.filter(
-            Q(equipement__nom__icontains=filtres["q"])
-            | Q(equipement__numero_serie__icontains=filtres["q"])
-            | Q(commentaire__icontains=filtres["q"])
-        )
+        interventions = interventions.recherche(filtres["q"])
     equipement_filtre = None
     if filtres["equipement"].isdigit() and (
         equipement_filtre := Equipement.objects.filter(pk=filtres["equipement"]).first()
@@ -86,6 +89,7 @@ def liste(request):
     if filtres["type"].isdigit() and (choix := types.filter(pk=filtres["type"]).first()):
         interventions = interventions.filter(type=choix)
         puces.append(puce(request, "Type", choix, "type"))
+    interventions, tri = trier(request, interventions, COLONNES_TRI)
 
     page = Paginator(interventions, 20).get_page(request.GET.get("page"))
     for intervention in page:
@@ -93,6 +97,7 @@ def liste(request):
 
     return render(request, "interventions/liste.html", {
         "page": page,
+        "tri": tri,
         "filtres": filtres,
         "filtre_actif": bool(filtres["q"] or puces),
         "puces": puces,

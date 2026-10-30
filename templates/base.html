@@ -69,11 +69,29 @@
                 aria-label="Afficher ou masquer le menu" aria-controls="at-sidebar" aria-expanded="true">
           <i data-lucide="menu"></i>
         </button>
+        {# Fil d'Ariane : rubrique parente sur une fiche ou un formulaire (aerotrack.context_processors) #}
+        {% if fil_ariane %}
+        <nav class="at-fil" aria-label="Fil d'Ariane">
+          <a href="{{ fil_ariane.url }}">{{ fil_ariane.libelle }}</a>
+          <i data-lucide="chevron-right"></i>
+        </nav>
+        {% endif %}
         <h1 class="at-page-title">{% block titre_page %}{% endblock %}</h1>
       </div>
       <div class="at-topbar-actions">
+        {# Recherche globale (Ctrl K) ; sur téléphone, la loupe ouvre la page de recherche #}
+        <form class="at-recherche-globale" action="{% url 'tableau_bord:recherche' %}" method="get" role="search">
+          <i data-lucide="search"></i>
+          <input type="search" name="q" id="at-recherche-globale" class="form-control"
+                 placeholder="Rechercher…" aria-label="Rechercher dans AéroTrack" autocomplete="off">
+          <kbd class="at-raccourci">Ctrl K</kbd>
+        </form>
+        <a href="{% url 'tableau_bord:recherche' %}" class="at-icone-btn at-recherche-icone" aria-label="Rechercher" title="Rechercher">
+          <i data-lucide="search"></i>
+        </a>
+
         {# Bascule mode clair / mode sombre #}
-        <button type="button" class="at-theme-btn" id="at-theme-btn" aria-label="Passer en mode sombre" title="Passer en mode sombre">
+        <button type="button" class="at-icone-btn at-theme-btn" id="at-theme-btn" aria-label="Passer en mode sombre" title="Passer en mode sombre">
           <i data-lucide="moon" class="at-icone-lune"></i>
           <i data-lucide="sun" class="at-icone-soleil"></i>
         </button>

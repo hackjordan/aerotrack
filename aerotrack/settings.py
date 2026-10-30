@@ -78,6 +78,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "comptes.context_processors.role",
+                "aerotrack.context_processors.fil_ariane",
             ],
         },
     },

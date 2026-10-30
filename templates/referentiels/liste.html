@@ -38,7 +38,10 @@
           {% endif %}
         </tr>
         {% empty %}
-        <tr><td colspan="{{ entetes|length|add:2 }}" class="text-center text-secondary py-4">Aucun élément enregistré.</td></tr>
+        <tr class="at-ligne-vide"><td colspan="{{ entetes|length|add:2 }}">
+          {% if est_admin %}{% url 'referentiels:ajouter' cle as url_ajout %}{% endif %}
+          {% include "includes/etat_vide.html" with icone=ref.icone titre="Aucun élément enregistré pour le moment" texte="Les éléments ajoutés à ce référentiel alimentent les listes déroulantes des formulaires." lien=url_ajout libelle_lien="Ajouter" %}
+        </td></tr>
         {% endfor %}
       </tbody>
     </table>

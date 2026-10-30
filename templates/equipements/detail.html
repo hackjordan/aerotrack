@@ -100,7 +100,9 @@
           <td class="text-end"><a href="{% url 'interventions:detail' i.pk %}" class="btn btn-sm btn-outline-secondary" title="Voir"><i data-lucide="eye"></i></a></td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="text-center text-secondary py-3">Aucune intervention enregistrée.</td></tr>
+        <tr class="at-ligne-vide"><td colspan="5">
+          {% include "includes/etat_vide.html" with icone="wrench" titre="Aucune intervention enregistrée" texte="Les interventions réalisées sur cet équipement apparaîtront ici." compact=True %}
+        </td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -123,7 +125,9 @@
           <td data-label="Commentaire">{{ h.commentaire|default:"—" }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="text-center text-secondary py-3">Aucun changement de statut enregistré.</td></tr>
+        <tr class="at-ligne-vide"><td colspan="5">
+          {% include "includes/etat_vide.html" with icone="history" titre="Aucun changement de statut enregistré" compact=True %}
+        </td></tr>
         {% endfor %}
       </tbody>
     </table>

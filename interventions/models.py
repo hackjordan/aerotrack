@@ -7,10 +7,21 @@ Règles de gestion appliquées ici :
 """
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 from equipements.models import Equipement
 from referentiels.models import Technicien, TypeIntervention
+
+
+class InterventionQuerySet(models.QuerySet):
+    def recherche(self, texte):
+        """Recherche par équipement, n° de série ou commentaire (liste F4.3 et recherche globale)."""
+        return self.filter(
+            Q(equipement__nom__icontains=texte)
+            | Q(equipement__numero_serie__icontains=texte)
+            | Q(commentaire__icontains=texte)
+        )
 
 
 class Intervention(models.Model):
@@ -39,6 +50,8 @@ class Intervention(models.Model):
     )
     cree_le = models.DateTimeField("créée le", auto_now_add=True)
     modifie_le = models.DateTimeField("modifiée le", auto_now=True)
+
+    objects = InterventionQuerySet.as_manager()
 
     class Meta:
         verbose_name = "intervention"

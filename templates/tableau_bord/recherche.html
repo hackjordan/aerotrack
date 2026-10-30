@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load statuts interface %}
+
+{% block titre %}Recherche{% endblock %}
+{% block titre_page %}Recherche{% endblock %}
+
+{% block contenu %}
+{# Grand champ de recherche : le seul accès à la recherche sur téléphone #}
+<form method="get" class="at-card mb-3" role="search">
+  <div class="at-recherche at-recherche-grande">
+    <i data-lucide="search"></i>
+    <input type="search" name="q" value="{{ texte }}" class="form-control"
+           placeholder="Nom, n° de série, marque, bâtiment, zone, commentaire…"
+           aria-label="Rechercher dans AéroTrack"{% if not texte %} autofocus{% endif %}>
+  </div>
+</form>
+
+{% if not texte %}
+<div class="at-card">
+  {% include "includes/etat_vide.html" with icone="search" titre="Que cherchez-vous ?" texte="Un équipement, un emplacement ou une intervention : tapez un nom, un n° de série, une marque, un bâtiment ou une zone." %}
+</div>
+
+{% elif not nb_total %}
+<div class="at-card">
+  {% include "includes/etat_vide.html" with icone="search-x" titre="Aucun résultat" texte="Vérifiez l'orthographe, ou essayez avec un autre mot : nom, n° de série, marque, bâtiment…" %}
+</div>
+
+{% else %}
+<p class="small text-secondary mb-3">{{ nb_total }} résultat{{ nb_total|pluralize }} pour « {{ texte }} »</p>
+
+{% if nb_equipements %}
+<div class="at-card mb-3">
+  <div class="at-card-entete">
+    <h2 class="h6 mb-0">Équipements <span class="at-compte">{{ nb_equipements }}</span></h2>
+    {% if nb_equipements > equipements|length %}
+    <a href="{% url 'equipements:liste' %}?q={{ texte|urlencode }}" class="small">Voir les {{ nb_equipements }} équipements</a>
+    {% endif %}
+  </div>
+  <ul class="at-liste-simple">
+    {% for e in equipements %}
+    <li>
+      <a href="{% url 'equipements:detail' e.pk %}">
+        <span>
+          <span class="fw-semibold">{{ e.nom|surligner:texte }}</span>
+          <span class="d-block small text-secondary">
+            <span class="font-monospace">{{ e.numero_serie|surligner:texte }}</span> · {{ e.marque|surligner:texte }} · {{ e.emplacement }}
+          </span>
+        </span>
+        {{ e.statut|badge_statut }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if nb_emplacements %}
+<div class="at-card mb-3">
+  <div class="at-card-entete">
+    <h2 class="h6 mb-0">Emplacements <span class="at-compte">{{ nb_emplacements }}</span></h2>
+    {% if nb_emplacements > emplacements|length %}
+    <a href="{% url 'emplacements:liste' %}?q={{ texte|urlencode }}" class="small">Voir les {{ nb_emplacements }} emplacements</a>
+    {% endif %}
+  </div>
+  <ul class="at-liste-simple">
+    {% for e in emplacements %}
+    <li>
+      <a href="{% url 'emplacements:detail' e.pk %}">
+        <span class="fw-semibold">{{ e.batiment|surligner:texte }} – {{ e.zone|surligner:texte }}</span>
+        <span class="small text-secondary text-nowrap">{{ e.nb_equipements }} équipement{{ e.nb_equipements|pluralize }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if nb_interventions %}
+<div class="at-card">
+  <div class="at-card-entete">
+    <h2 class="h6 mb-0">Interventions <span class="at-compte">{{ nb_interventions }}</span></h2>
+    {% if nb_interventions > interventions|length %}
+    <a href="{% url 'interventions:liste' %}?q={{ texte|urlencode }}" class="small">Voir les {{ nb_interventions }} interventions</a>
+    {% endif %}
+  </div>
+  <ul class="at-liste-simple">
+    {% for i in interventions %}
+    <li>
+      <a href="{% url 'interventions:detail' i.pk %}">
+        <span>
+          <span class="fw-semibold">{{ i.equipement.nom|surligner:texte }}</span>
+          <span class="d-block small text-secondary">{{ i.type }} · {% if i.commentaire %}{{ i.commentaire|truncatechars:90|surligner:texte }}{% else %}Sans commentaire{% endif %}</span>
+        </span>
+        <span class="small text-secondary text-nowrap">{{ i.date|date:"d/m/Y" }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

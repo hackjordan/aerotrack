@@ -1,0 +1,15 @@
+{% comment %}
+État vide d'une liste : icône, titre, texte et bouton facultatifs.
+Paramètres : icone, titre, texte, lien, libelle_lien, icone_lien (défaut « plus »),
+classe_lien (défaut « btn-primary »), compact (version réduite pour une liste secondaire).
+{% endcomment %}
+<div class="at-etat-vide{% if compact %} compact{% endif %}">
+  <span class="at-etat-vide-icone"><i data-lucide="{{ icone }}"></i></span>
+  <p class="at-etat-vide-titre">{{ titre }}</p>
+  {% if texte %}<p class="at-etat-vide-texte">{{ texte }}</p>{% endif %}
+  {% if lien %}
+  <a href="{{ lien }}" class="btn btn-sm {{ classe_lien|default:'btn-primary' }} d-inline-flex align-items-center gap-1">
+    <i data-lucide="{{ icone_lien|default:'plus' }}"></i> {{ libelle_lien }}
+  </a>
+  {% endif %}
+</div>

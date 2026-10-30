@@ -151,6 +151,39 @@ class PagesEquipementsTests(TestCase):
         self.assertContains(reponse, "Émetteur VHF")
         self.assertNotContains(reponse, "Radar primaire")
 
+    def test_tri_par_colonne(self):
+        self.client.force_login(self.tech)
+        url = reverse("equipements:liste")
+
+        def series(tri):
+            return [e.numero_serie for e in self.client.get(url, {"tri": tri}).context["page"]]
+
+        self.assertEqual(series("serie"), ["RAD-001", "VHF-118"])
+        self.assertEqual(series("-serie"), ["VHF-118", "RAD-001"])
+        self.assertEqual(self.client.get(url, {"tri": "inconnu"}).context["tri"], "")  # colonne non autorisée
+        # En-tête actif : sens indiqué, et le clic suivant inverse l'ordre
+        reponse = self.client.get(url, {"tri": "serie", "q": "a"})
+        self.assertContains(reponse, 'aria-sort="ascending"')
+        self.assertContains(reponse, 'href="?tri=-serie&amp;q=a"')  # la recherche est conservée
+
+    def test_fil_d_ariane(self):
+        self.client.force_login(self.tech)
+        fiche = self.client.get(reverse("equipements:detail", args=[self.radar1.pk]))
+        self.assertContains(fiche, 'aria-label="Fil d\'Ariane"')
+        self.assertEqual(fiche.context["fil_ariane"]["url"], reverse("equipements:liste"))
+        self.assertNotIn("fil_ariane", self.client.get(reverse("equipements:liste")).context)
+
+    def test_liste_vide(self):
+        self.client.force_login(self.tech)
+        reponse = self.client.get(reverse("equipements:liste"), {"q": "introuvable"})
+        self.assertContains(reponse, "Aucun équipement ne correspond à ces critères")
+        self.assertContains(reponse, "Effacer la recherche et les filtres")
+        # Le bouton d'ajout n'est proposé qu'à l'administrateur
+        Equipement.objects.all().delete()
+        self.assertNotContains(self.client.get(reverse("equipements:liste")), "Ajouter un équipement")
+        self.client.force_login(self.admin)
+        self.assertContains(self.client.get(reverse("equipements:liste")), "Ajouter un équipement")
+
     def test_filtres_type_et_statut(self):
         self.client.force_login(self.tech)
         reponse = self.client.get(reverse("equipements:liste"), {"statut": Statut.EN_PANNE})

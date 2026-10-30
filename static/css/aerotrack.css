@@ -206,9 +206,10 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
   background: linear-gradient(90deg, var(--at-logo-marine) 0%, var(--at-logo-ciel) 55%, var(--at-logo-or) 100%);
 }
-.at-page-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; margin: 0; }
-.at-topbar-left { display: flex; align-items: center; gap: .75rem; min-width: 0; }
-.at-topbar-actions { display: flex; gap: .5rem; align-items: center; }
+/* Titre long (nom d'un équipement) : une seule ligne, coupée par « … » */
+.at-page-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.at-topbar-left { display: flex; align-items: center; gap: .75rem; flex: 1; min-width: 0; }
+.at-topbar-actions { display: flex; gap: .5rem; align-items: center; flex-shrink: 0; margin-left: 1rem; }
 
 .at-content { padding: 1.5rem 1.75rem; }
 
@@ -253,8 +254,7 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
   }
   .at-topbar { padding: .75rem 1rem; }
   .at-content { padding: 1rem; }
-  /* Titre long (nom d'un équipement) : une seule ligne, coupée par « … » */
-  .at-page-title { font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .at-page-title { font-size: 1.1rem; }
 }
 
 /* ---------- Cartes et indicateurs ---------- */
@@ -587,6 +587,101 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
   100% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0); }
 }
 
+/* ---------- Message d'accueil du tableau de bord ---------- */
+.at-accueil { margin-bottom: 1.25rem; }
+.at-accueil-titre { margin: 0; font-size: 1.65rem; font-weight: 700; letter-spacing: -.02em; }
+/* Prénom en dégradé marine → bleu ciel du logo (bleu ciel → or en mode sombre) */
+.at-accueil-nom {
+  background: linear-gradient(90deg, var(--at-logo-marine), var(--at-logo-ciel));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+[data-bs-theme="dark"] .at-accueil-nom { background-image: linear-gradient(90deg, var(--at-logo-ciel), var(--at-logo-or)); }
+.at-accueil-date { display: flex; align-items: center; gap: .4rem; margin: .35rem 0 0; font-size: .9rem; color: var(--at-texte-2); }
+.at-accueil-date svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--at-logo-ciel); }
+@media (max-width: 575.98px) {
+  .at-accueil-titre { font-size: 1.35rem; }
+  .at-accueil-date { font-size: .82rem; }
+}
+
+/* ---------- Fil d'Ariane : rubrique parente (lien) avant le titre de la page ---------- */
+.at-fil { display: flex; align-items: center; gap: .35rem; flex-shrink: 0; margin-right: -.4rem; font-size: 1rem; }
+.at-fil a { color: var(--at-texte-2); font-weight: 500; text-decoration: none; transition: color .15s ease; }
+.at-fil a:hover { color: var(--at-lien); }
+.at-fil svg { width: 16px; height: 16px; color: var(--at-texte-2); opacity: .6; }
+@media (max-width: 767.98px) { .at-fil { display: none; } }
+
+/* ---------- Recherche globale (barre du haut) : champ arrondi qui s'élargit au focus ---------- */
+.at-recherche-globale { position: relative; }
+.at-recherche-globale > svg {
+  position: absolute; left: .8rem; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; color: var(--at-texte-2); pointer-events: none;
+}
+.at-recherche-globale .form-control {
+  width: 230px; height: 38px; padding: .4rem 3.6rem .4rem 2.3rem; border-radius: 999px;
+  background-color: var(--at-champ-fond); border-color: var(--at-champ-bordure); font-size: .875rem;
+  transition: width .25s ease, border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+.at-recherche-globale .form-control:focus { width: 320px; background-color: var(--at-carte); }
+/* Rappel du raccourci clavier, masqué dès qu'on écrit */
+.at-raccourci {
+  position: absolute; right: .55rem; top: 50%; transform: translateY(-50%);
+  padding: .1rem .4rem; border: 1px solid var(--at-bordure); border-radius: 6px;
+  background: var(--at-carte); color: var(--at-texte-2); box-shadow: none;
+  font-family: inherit; font-size: .7rem; font-weight: 600; pointer-events: none; transition: opacity .15s ease;
+}
+.at-recherche-globale .form-control:focus ~ .at-raccourci,
+.at-recherche-globale .form-control:not(:placeholder-shown) ~ .at-raccourci { opacity: 0; }
+/* Téléphone : une loupe ouvre la page de recherche
+   (double classe : l'emporte sur l'affichage commun des boutons d'icône) */
+.at-icone-btn.at-recherche-icone { display: none; }
+@media (max-width: 767.98px) {
+  .at-recherche-globale { display: none; }
+  .at-icone-btn.at-recherche-icone { display: inline-flex; }
+}
+/* Page de recherche : grand champ */
+.at-recherche-grande { max-width: none; }
+.at-recherche-grande svg { left: 1rem; width: 20px; height: 20px; }
+.at-recherche-grande .form-control { padding: .8rem 1rem .8rem 2.9rem; border-radius: 12px; font-size: 1.05rem; }
+/* Nombre de résultats à côté d'un titre de carte */
+.at-compte {
+  display: inline-block; margin-left: .35rem; padding: .05rem .5rem; border-radius: 999px; vertical-align: .1em;
+  background: var(--at-bleu-clair); color: var(--at-lien); font-size: .75rem; font-weight: 600;
+}
+/* Mot trouvé par la recherche, surligné en or du logo */
+.at-surligne { padding: 0 .1em; border-radius: 3px; background: rgba(248, 216, 72, .45); color: inherit; }
+[data-bs-theme="dark"] .at-surligne { background: rgba(248, 216, 72, .28); }
+
+/* ---------- En-têtes de colonnes triables ---------- */
+.at-tri { display: inline-flex; align-items: center; gap: .3rem; color: inherit; text-decoration: none; }
+.at-tri svg { width: 14px; height: 14px; opacity: .35; transition: opacity .15s ease; }
+.at-tri:hover, .at-tri.actif { color: var(--at-lien); }
+.at-tri:hover svg, .at-tri.actif svg { opacity: 1; }
+
+/* ---------- Listes vides : icône, phrase et bouton d'action ---------- */
+.at-etat-vide { display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; text-align: center; }
+.at-etat-vide-icone {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 64px; height: 64px; margin-bottom: .9rem; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(10, 168, 230, .22), rgba(10, 42, 128, .1));
+  box-shadow: 0 0 0 8px rgba(10, 168, 230, .06);
+  color: var(--at-lien);
+  animation: at-flotte 3.2s ease-in-out infinite;
+}
+.at-etat-vide-icone svg { width: 28px; height: 28px; }
+@keyframes at-flotte { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.at-etat-vide-titre { margin: 0; font-weight: 600; color: var(--at-texte); }
+.at-etat-vide-texte { max-width: 28rem; margin: .3rem 0 0; font-size: .875rem; color: var(--at-texte-2); }
+.at-etat-vide .btn { margin-top: 1rem; }
+.at-etat-vide.compact { padding: 1.25rem 1rem; }
+.at-etat-vide.compact .at-etat-vide-icone { width: 48px; height: 48px; margin-bottom: .6rem; box-shadow: 0 0 0 6px rgba(10, 168, 230, .06); }
+.at-etat-vide.compact .at-etat-vide-icone svg { width: 22px; height: 22px; }
+/* La ligne de tableau qui porte l'état vide ne réagit pas au survol */
+.table-hover > tbody > tr.at-ligne-vide:hover > * { --bs-table-bg-state: transparent; }
+
+/* ---------- Bouton pendant l'envoi d'un formulaire : indicateur à la place de l'icône ---------- */
+.at-envoi > svg { display: none; }
+.at-envoi .spinner-border { width: 1em; height: 1em; margin-right: .35rem; border-width: .15em; vertical-align: -.125em; }
+
 /* ---------- Animations ---------- */
 /* Arrivée d'une page : chaque bloc monte légèrement en apparaissant, l'un après l'autre */
 @keyframes at-monte { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
@@ -601,17 +696,23 @@ body { background: var(--at-fond); color: var(--at-texte); font-family: var(--bs
 .at-content .row > :nth-child(3) { animation-delay: .14s; }
 .at-content .row > :nth-child(4) { animation-delay: .21s; }
 
-/* ---------- Bouton clair / sombre (barre du haut) ---------- */
-.at-theme-btn {
+/* ---------- Boutons d'icône de la barre du haut (loupe sur téléphone, clair / sombre) ---------- */
+.at-icone-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 38px; height: 38px; flex-shrink: 0;
   border: 1px solid var(--at-bordure); border-radius: 10px;
-  background: var(--at-carte); cursor: pointer;
-  transition: background-color .15s ease, border-color .15s ease;
+  background: var(--at-carte); color: var(--at-texte-2); cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
-.at-theme-btn:hover { background: rgba(10, 168, 230, .1); border-color: rgba(10, 168, 230, .4); }
-.at-theme-btn svg { width: 18px; height: 18px; transition: transform .4s ease; }
+.at-icone-btn:hover { background: rgba(10, 168, 230, .1); border-color: rgba(10, 168, 230, .4); color: var(--at-lien); }
+.at-icone-btn svg { width: 18px; height: 18px; transition: transform .4s ease; }
 .at-theme-btn:hover svg { transform: rotate(-25deg); }
+/* Téléphone : barre du haut plus compacte, pour laisser de la place au titre */
+@media (max-width: 575.98px) {
+  .at-icone-btn, .at-menu-btn { width: 34px; height: 34px; }
+  .at-topbar-left { gap: .5rem; }
+  .at-topbar-actions { gap: .35rem; margin-left: .5rem; }
+}
 /* Lune marine en mode clair, soleil or en mode sombre */
 .at-theme-btn .at-icone-lune { color: var(--at-logo-marine); }
 .at-theme-btn .at-icone-soleil { display: none; color: var(--at-logo-or); }

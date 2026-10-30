@@ -60,7 +60,10 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="6" class="text-center text-secondary py-4">Aucun compte trouvé.</td></tr>
+        <tr class="at-ligne-vide"><td colspan="6">
+          {% url 'comptes:utilisateurs' as url_liste %}
+          {% include "includes/etat_vide.html" with icone="user-search" titre="Aucun compte trouvé" texte="Essayez avec un autre identifiant, nom ou prénom." lien=url_liste libelle_lien="Effacer la recherche" icone_lien="x" classe_lien="btn-outline-secondary" %}
+        </td></tr>
         {% endfor %}
       </tbody>
     </table>

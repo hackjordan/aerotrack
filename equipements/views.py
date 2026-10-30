@@ -2,11 +2,11 @@
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import ProtectedError, Q
+from django.db.models import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from aerotrack.filtres import puce
+from aerotrack.filtres import puce, trier
 from comptes.roles import ADMINISTRATEUR, TECHNICIEN, role_requis
 from emplacements.models import Emplacement
 from referentiels.models import Categorie, TypeEquipement
@@ -16,6 +16,15 @@ from .models import Equipement, Statut
 from .services import changer_statut, enregistrer_changement_statut
 
 TOUS_LES_ROLES = (ADMINISTRATEUR, TECHNICIEN)
+
+# Colonnes triables de la liste : clé de l'URL → champs du tri
+COLONNES_TRI = {
+    "nom": ["nom"],
+    "serie": ["numero_serie"],
+    "type": ["type__libelle"],
+    "emplacement": ["emplacement__batiment", "emplacement__zone"],
+    "statut": ["statut"],
+}
 
 
 @role_requis(*TOUS_LES_ROLES)
@@ -36,11 +45,7 @@ def liste(request):
     puces = []
 
     if filtres["q"]:
-        equipements = equipements.filter(
-            Q(nom__icontains=filtres["q"])
-            | Q(numero_serie__icontains=filtres["q"])
-            | Q(marque__icontains=filtres["q"])
-        )
+        equipements = equipements.recherche(filtres["q"])
     if filtres["categorie"].isdigit() and (choix := categories.filter(pk=filtres["categorie"]).first()):
         equipements = equipements.filter(type__categorie=choix)
         puces.append(puce(request, "Catégorie", choix, "categorie"))
@@ -53,9 +58,11 @@ def liste(request):
     if filtres["statut"] in Statut.values:
         equipements = equipements.filter(statut=filtres["statut"])
         puces.append(puce(request, "Statut", Statut(filtres["statut"]).label, "statut"))
+    equipements, tri = trier(request, equipements, COLONNES_TRI)
 
     return render(request, "equipements/liste.html", {
         "page": Paginator(equipements, 20).get_page(request.GET.get("page")),
+        "tri": tri,
         "filtres": filtres,
         "filtre_actif": bool(filtres["q"] or puces),
         "puces": puces,
