@@ -1,0 +1,14 @@
+{% comment %}
+Thème clair ou sombre, appliqué avant l'affichage pour éviter un flash blanc.
+Choix mémorisé par le bouton de la barre du haut ; sinon, réglage du système.
+{% endcomment %}
+<script>
+  (function () {
+    var theme = null;
+    try { theme = localStorage.getItem("aerotrack.theme"); } catch (e) { /* stockage indisponible */ }
+    if (theme !== "clair" && theme !== "sombre") {
+      theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "sombre" : "clair";
+    }
+    document.documentElement.setAttribute("data-bs-theme", theme === "sombre" ? "dark" : "light");
+  })();
+</script>

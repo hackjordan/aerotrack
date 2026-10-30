@@ -125,14 +125,18 @@
   (function () {
     var d = JSON.parse(document.getElementById("donnees-categories").textContent);
     var total = d.valeurs.reduce(function (a, b) { return a + b; }, 0);
-    new Chart(document.getElementById("graphique-categories"), {
+    // Séparation entre les parts : couleur de la carte (blanc, ou marine en mode sombre)
+    function couleurCarte() {
+      return getComputedStyle(document.documentElement).getPropertyValue("--at-carte").trim() || "#ffffff";
+    }
+    var graphique = new Chart(document.getElementById("graphique-categories"), {
       type: "pie",
       data: {
         labels: d.libelles,
         datasets: [{
           data: d.valeurs,
           backgroundColor: d.couleurs,
-          borderColor: "#ffffff",   // 2 px de séparation entre les parts
+          borderColor: couleurCarte(),   // 2 px de séparation entre les parts
           borderWidth: 2,
           hoverOffset: 6
         }]
@@ -152,6 +156,11 @@
           }
         }
       }
+    });
+    // Changement de thème (bouton clair / sombre) : nouvelle couleur de séparation
+    document.addEventListener("at-theme", function () {
+      graphique.data.datasets[0].borderColor = couleurCarte();
+      graphique.update("none");
     });
   })();
 </script>

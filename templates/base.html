@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block titre %}Accueil{% endblock %} · AéroTrack</title>
+  {% include "includes/theme_head.html" %}
   <link rel="icon" href="{% static 'img/logo-asecna.jpg' %}">
   <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/aerotrack.css' %}">
@@ -71,6 +72,12 @@
         <h1 class="at-page-title">{% block titre_page %}{% endblock %}</h1>
       </div>
       <div class="at-topbar-actions">
+        {# Bascule mode clair / mode sombre #}
+        <button type="button" class="at-theme-btn" id="at-theme-btn" aria-label="Passer en mode sombre" title="Passer en mode sombre">
+          <i data-lucide="moon" class="at-icone-lune"></i>
+          <i data-lucide="sun" class="at-icone-soleil"></i>
+        </button>
+
         {# Menu de l'utilisateur connecté #}
         <div class="dropdown">
           <button type="button" class="at-user-btn" data-bs-toggle="dropdown" aria-expanded="false">

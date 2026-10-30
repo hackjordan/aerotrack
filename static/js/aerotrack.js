@@ -51,6 +51,31 @@
   petitEcran.addEventListener("change", fermerMobile);
 })();
 
+/* Bouton clair / sombre : bascule le thème Bootstrap (data-bs-theme) et mémorise le choix.
+   Le thème de départ est posé dans le <head> (includes/theme_head.html). */
+(function () {
+  var bouton = document.getElementById("at-theme-btn");
+  if (!bouton) return;
+  var racine = document.documentElement;
+
+  function majBouton() {
+    var texte = racine.getAttribute("data-bs-theme") === "dark" ? "Passer en mode clair" : "Passer en mode sombre";
+    bouton.setAttribute("aria-label", texte);
+    bouton.title = texte;
+  }
+
+  majBouton();
+  bouton.addEventListener("click", function () {
+    var sombre = racine.getAttribute("data-bs-theme") !== "dark";
+    racine.classList.add("at-bascule-theme");  // fondu des couleurs
+    racine.setAttribute("data-bs-theme", sombre ? "dark" : "light");
+    try { localStorage.setItem("aerotrack.theme", sombre ? "sombre" : "clair"); } catch (e) { /* stockage indisponible */ }
+    majBouton();
+    document.dispatchEvent(new Event("at-theme"));  // le graphique adapte ses couleurs
+    setTimeout(function () { racine.classList.remove("at-bascule-theme"); }, 400);
+  });
+})();
+
 /* Compteurs (data-compteur) : le chiffre défile de 0 à sa valeur au chargement. */
 (function () {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
