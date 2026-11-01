@@ -5,6 +5,7 @@ venv/
 # Base de données et fichiers générés
 db.sqlite3
 *.sqlite3
+donnees_hebergeur.json
 staticfiles/
 media/
 

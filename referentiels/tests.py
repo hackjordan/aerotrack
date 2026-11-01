@@ -1,11 +1,19 @@
-"""Tests du module 5 : référentiels (F5.1 à F5.4)."""
-from django.contrib.auth import get_user_model
+"""Tests du module 5 : référentiels (F5.1 à F5.4) et commandes de passage à l'hébergeur."""
+import tempfile
+from datetime import date
+from io import StringIO
+from pathlib import Path
+
+from django.contrib.auth import authenticate, get_user_model
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import TestCase
 from django.urls import reverse
 
-from comptes.roles import ADMINISTRATEUR, TECHNICIEN, definir_role
+from comptes.roles import ADMINISTRATEUR, TECHNICIEN, definir_role, role_de
 from emplacements.models import Emplacement
-from equipements.models import Equipement
+from equipements.models import Equipement, HistoriqueStatut, Statut
+from interventions.models import Intervention
 
 from .models import Categorie, Fournisseur, Technicien, TypeEquipement, TypeIntervention
 from .views import REFERENTIELS
@@ -122,3 +130,102 @@ class ReferentielsTests(TestCase):
         self.client.force_login(self.admin)
         self.client.post(reverse("referentiels:supprimer", args=["types-intervention", self.corrective.pk]))
         self.assertFalse(TypeIntervention.objects.filter(pk=self.corrective.pk).exists())
+
+
+class ExportChargementTests(TestCase):
+    """Commandes exporter_donnees et charger_donnees."""
+
+    MDP = "mot-de-passe-1"
+
+    @classmethod
+    def setUpTestData(cls):
+        User = get_user_model()
+        cls.saisie = User.objects.create_user("saisie", password="x")
+        cls.compte = User.objects.create_user("aline", password=cls.MDP, first_name="Aline", last_name="Eto")
+        definir_role(cls.compte, TECHNICIEN)
+        technicien = Technicien.objects.create(nom="Eto", prenom="Aline", unite="RSI", utilisateur=cls.compte)
+        cls.equipement = Equipement.objects.create(
+            nom="Radar", numero_serie="R1", marque="Thales", statut=Statut.EN_PANNE,
+            type=TypeEquipement.objects.create(libelle="Radar"),
+            emplacement=Emplacement.objects.create(batiment="Tour", zone="Vigie"),
+        )
+        Intervention.objects.create(
+            date=date(2026, 10, 1), equipement=cls.equipement, technicien=technicien,
+            type=TypeIntervention.objects.create(libelle="Corrective", est_corrective=True),
+            commentaire="Carte remplacée", panne_resolue=True, cree_par=cls.saisie,
+        )
+
+    def setUp(self):
+        dossier = tempfile.TemporaryDirectory()
+        self.addCleanup(dossier.cleanup)
+        self.fichier = Path(dossier.name) / "donnees.json"
+        call_command("exporter_donnees", fichier=self.fichier, stdout=StringIO())
+
+    def charger(self):
+        call_command("charger_donnees", fichier=self.fichier, stdout=StringIO())
+
+    def vider_serveur(self):
+        """Serveur où existent les équipements et les types, mais pas encore ces données."""
+        Intervention.objects.all().delete()
+        Technicien.objects.all().delete()
+        self.compte.delete()
+
+    def test_fichier_sans_mot_de_passe_en_clair(self):
+        contenu = self.fichier.read_text(encoding="utf-8")
+        self.assertNotIn(self.MDP, contenu)
+        self.assertIn(self.compte.password, contenu)
+
+    def test_chargement_recree_tout(self):
+        self.vider_serveur()
+        self.charger()
+        technicien = Technicien.objects.get(nom="Eto", prenom="Aline")
+        self.assertEqual(technicien.unite, "RSI")
+        self.assertEqual(authenticate(username="aline", password=self.MDP), technicien.utilisateur)
+        self.assertEqual(role_de(technicien.utilisateur), TECHNICIEN)
+        intervention = Intervention.objects.get()
+        self.assertEqual(intervention.technicien, technicien)
+        self.assertEqual(intervention.date, date(2026, 10, 1))
+        self.assertTrue(intervention.panne_resolue)
+        self.assertEqual(intervention.cree_par, self.saisie)
+
+    def test_relance_sans_doublon(self):
+        self.vider_serveur()
+        self.charger()
+        self.charger()
+        self.assertEqual(Technicien.objects.count(), 1)
+        self.assertEqual(Intervention.objects.count(), 1)
+        self.assertEqual(get_user_model().objects.filter(username="aline").count(), 1)
+
+    def test_statut_des_equipements_inchange(self):
+        historique = HistoriqueStatut.objects.count()
+        self.vider_serveur()
+        self.charger()
+        self.equipement.refresh_from_db()
+        self.assertEqual(self.equipement.statut, Statut.EN_PANNE)
+        self.assertEqual(HistoriqueStatut.objects.count(), historique)
+
+    def test_equipement_absent_rien_n_est_charge(self):
+        self.vider_serveur()
+        Equipement.objects.update(numero_serie="AUTRE")
+        with self.assertRaisesMessage(CommandError, "init_demo"):
+            self.charger()
+        self.assertFalse(Technicien.objects.exists())
+        self.assertFalse(get_user_model().objects.filter(username="aline").exists())
+
+    def test_compte_existant_garde_son_mot_de_passe(self):
+        self.compte.set_password("change-sur-le-serveur")
+        self.compte.save()
+        self.charger()
+        self.assertEqual(authenticate(username="aline", password="change-sur-le-serveur"), self.compte)
+        self.assertIsNone(authenticate(username="aline", password=self.MDP))
+
+    def test_auteur_absent_du_serveur(self):
+        self.vider_serveur()
+        self.saisie.delete()
+        self.charger()
+        self.assertIsNone(Intervention.objects.get().cree_par)
+
+    def test_fichier_absent(self):
+        self.fichier.unlink()
+        with self.assertRaisesMessage(CommandError, "Fichier introuvable"):
+            self.charger()

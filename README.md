@@ -121,5 +121,27 @@ venv/bin/python manage.py collectstatic --noinput
 
 Puis cliquez sur **Reload** dans l'onglet **Web**.
 
+### Charger les techniciens et les interventions
+
+Ces données ne passent pas par GitHub : elles contiennent des noms et des mots de passe chiffrés.
+
+Sur votre poste, créez le fichier `donnees_hebergeur.json` :
+
+```powershell
+.\venv\Scripts\python manage.py exporter_donnees
+```
+
+Dans l'onglet **Files**, ouvrez `/home/<nom>/aerotrack/` et envoyez ce fichier avec **Upload a file**. Ensuite, dans une console **Bash** :
+
+```bash
+cd ~/aerotrack
+git pull
+venv/bin/python manage.py charger_donnees
+rm donnees_hebergeur.json
+```
+
+Les équipements doivent déjà exister sur le serveur (`init_demo` ou base importée). Sinon, rien n'est chargé.
+La commande peut être relancée : ce qui existe déjà est ignoré, et un compte existant garde son mot de passe.
+
 Avec un compte gratuit, cliquez sur **Run until 3 months from today** dans l'onglet **Web** au moins une fois tous les 3 mois.
 Sinon, PythonAnywhere désactive le site.
